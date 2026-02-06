@@ -1,0 +1,29 @@
+<div class="csv-import-export-container">
+  <div class="csv-actions">
+    <button class="btn btn-csv" (click)="exportCSVTemplate()" [disabled]="isLoading">
+      📥 Download Template CSV
+    </button>
+    <button class="btn btn-csv" (click)="exportCSVWithData()" [disabled]="books.length === 0 || isLoading">
+      💾 Export to CSV ({{ books.length }} books)
+    </button>
+    <label class="btn btn-csv" [class.disabled]="isLoading">
+      📤 Import from CSV
+      <input 
+        type="file" 
+        accept=".csv,text/csv" 
+        (change)="importCSV($event)"
+        style="display: none;"
+        [disabled]="isLoading">
+    </label>
+  </div>
+  
+  <div class="loading-indicator" *ngIf="isLoading">
+    <div class="spinner"></div>
+    <span>Importing books...</span>
+  </div>
+  
+  <p class="csv-help">
+    Download the template CSV to see the required format, or export your current reading list. 
+    Import a CSV file to add multiple books at once.
+  </p>
+</div>

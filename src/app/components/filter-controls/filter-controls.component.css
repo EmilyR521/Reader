@@ -1,0 +1,360 @@
+.filter-controls {
+  margin-bottom: 20px;
+}
+
+/* Filter Header with Toggle Button */
+.filter-header {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 15px;
+  flex-wrap: wrap;
+}
+
+.filter-toggle-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: var(--card-bg);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.filter-toggle-btn:hover {
+  background: var(--form-bg);
+  border-color: var(--accent-color);
+}
+
+.filter-toggle-icon {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  transition: transform 0.3s ease;
+  display: inline-block;
+}
+
+.filter-toggle-icon.expanded {
+  transform: rotate(180deg);
+}
+
+.active-filters-inline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  flex: 1;
+}
+
+.filter-expander-content {
+  margin-top: 15px;
+  padding: 15px;
+  background: var(--form-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  animation: slideDown 0.3s ease;
+}
+
+/* Graph Mode Filters */
+.graph-filter-inputs {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.date-range-inputs {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.date-range-inputs input[type="date"] {
+  flex: 1;
+  min-width: 150px;
+  padding: 10px;
+  border: 1px solid var(--input-border);
+  border-radius: 4px;
+  background: var(--input-bg);
+  color: var(--text-primary);
+  font-size: 0.95rem;
+}
+
+.date-range-inputs input[type="date"]:focus {
+  outline: none;
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 3px var(--focus-shadow);
+}
+
+.date-range-separator {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.filter-help-text {
+  display: block;
+  margin-top: 6px;
+  color: var(--text-tertiary);
+  font-size: 0.85rem;
+  font-style: italic;
+}
+
+.year-filter-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.year-filter-btn {
+  padding: 8px 16px;
+  background: var(--card-bg);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.year-filter-btn:hover {
+  background: var(--form-bg);
+  border-color: var(--accent-color);
+  transform: translateY(-1px);
+}
+
+.year-filter-btn.active {
+  background: var(--accent-color);
+  color: var(--btn-text);
+  border-color: var(--accent-color);
+  font-weight: 600;
+}
+
+/* Active Filters Display */
+.active-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.filter-lozenge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: var(--accent-color);
+  color: var(--btn-text);
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.filter-remove {
+  background: none;
+  border: none;
+  color: var(--btn-text);
+  cursor: pointer;
+  font-size: 1.2rem;
+  line-height: 1;
+  padding: 0;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background 0.2s ease;
+  margin-left: 2px;
+}
+
+.filter-remove:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.clear-all-btn {
+  padding: 6px 12px;
+  background: var(--card-bg);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.clear-all-btn:hover {
+  background: var(--form-bg);
+  border-color: var(--accent-color);
+}
+
+/* Table Mode Inputs */
+.table-filter-inputs {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 15px;
+  flex-wrap: wrap;
+}
+
+.filter-input-group {
+  flex: 1;
+  min-width: 200px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.filter-input-group label {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+}
+
+.filter-input-group input {
+  padding: 10px;
+  border: 1px solid var(--input-border);
+  border-radius: 4px;
+  background: var(--input-bg);
+  color: var(--text-primary);
+  font-size: 0.95rem;
+}
+
+.filter-input-group input:focus {
+  outline: none;
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 3px var(--focus-shadow);
+}
+
+/* Multiselect Dropdowns */
+.multiselect-toggle {
+  width: 100%;
+  padding: 10px 12px;
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  border-radius: 4px;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.2s ease;
+}
+
+.multiselect-toggle:hover {
+  border-color: var(--accent-color);
+}
+
+.multiselect-toggle.active {
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 3px var(--focus-shadow);
+}
+
+.dropdown-icon {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  transition: transform 0.2s ease;
+}
+
+.multiselect-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin-top: 4px;
+  background: var(--form-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 100;
+  animation: slideDown 0.2s ease;
+}
+
+.multiselect-search {
+  padding: 8px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.multiselect-search input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid var(--input-border);
+  border-radius: 4px;
+  background: var(--input-bg);
+  color: var(--text-primary);
+  font-size: 0.9rem;
+}
+
+.multiselect-list {
+  max-height: 200px;
+  overflow-y: auto;
+  padding: 4px 0;
+}
+
+.multiselect-list::-webkit-scrollbar {
+  width: 8px;
+}
+
+.multiselect-list::-webkit-scrollbar-track {
+  background: var(--form-bg);
+  border-radius: 4px;
+}
+
+.multiselect-list::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 4px;
+}
+
+.multiselect-list::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-color);
+}
+
+.multiselect-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  user-select: none;
+}
+
+.multiselect-item:hover {
+  background: var(--card-bg);
+}
+
+.multiselect-item.selected {
+  background: rgba(139, 111, 71, 0.1);
+}
+
+.multiselect-item input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: var(--accent-color);
+  flex-shrink: 0;
+}
+
+.multiselect-item span {
+  flex: 1;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+}
+
+.multiselect-empty {
+  padding: 12px;
+  text-align: center;
+  color: var(--text-tertiary);
+  font-size: 0.85rem;
+  font-style: italic;
+}
+
+.filter-input-group {
+  position: relative;
+}

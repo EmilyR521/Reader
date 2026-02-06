@@ -1,0 +1,13 @@
+<div class="view-toolbar">
+  <div class="view-buttons">
+    <button
+      *ngFor="let view of views"
+      class="view-btn"
+      [class.active]="currentView === view.type"
+      (click)="selectView(view.type)"
+      [attr.aria-label]="view.label + ' view'">
+      <span class="view-icon">{{ view.icon }}</span>
+      <span class="view-label">{{ view.label }}</span>
+    </button>
+  </div>
+</div>

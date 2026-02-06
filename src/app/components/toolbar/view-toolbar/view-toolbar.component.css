@@ -1,0 +1,11 @@
+/* Component-specific overrides only */
+
+@media (max-width: 600px) {
+  .view-label {
+    display: none;
+  }
+
+  .view-btn {
+    padding: 10px 15px;
+  }
+}

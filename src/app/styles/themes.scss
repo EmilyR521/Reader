@@ -1,0 +1,146 @@
+/* ============================================================================
+   THEME VARIABLES
+   ============================================================================ */
+.bookish-light {
+  --bg-gradient-start: #f5f1e8;
+  --bg-gradient-end: #e8dcc6;
+  --header-text-color: #2c1810;
+  --main-bg: #faf8f3;
+  --main-shadow: rgba(44, 24, 16, 0.15);
+  --toggle-bg: rgba(250, 248, 243, 0.95);
+  --toggle-bg-hover: rgba(250, 248, 243, 1);
+  --toggle-text: #2c1810;
+  --toggle-border: rgba(139, 115, 85, 0.3);
+  --text-primary: #2c1810;
+  --text-secondary: #5c4a37;
+  --text-tertiary: #8b7355;
+  --border-color: #d4c4b0;
+  --accent-color: #8b6f47;
+  --success-color: #6b8e23;
+  --form-bg: #f5ede0;
+  --card-bg: #fefcf8;
+  --card-read-bg: #f0ead6;
+  --card-shadow: rgba(44, 24, 16, 0.12);
+  --input-bg: #ffffff;
+  --input-border: #c9b99b;
+  --focus-shadow: rgba(139, 111, 71, 0.2);
+  --book-spine: #8b6f47;
+  --paper-texture: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23d4c4b0' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  /* Common button/tag colors */
+  --btn-text: #faf8f3;
+  --btn-hover: #6b5a47;
+  --btn-shadow: rgba(44, 24, 16, 0.15);
+  --btn-shadow-inset: rgba(255, 255, 255, 0.3);
+}
+
+.bookish-dark {
+  --bg-gradient-start: #0f0d0a;
+  --bg-gradient-end: #1a1510;
+  --header-text-color: #e8dcc6;
+  --main-bg: #2a241c;
+  --main-shadow: rgba(0, 0, 0, 0.4);
+  --toggle-bg: rgba(42, 36, 28, 0.95);
+  --toggle-bg-hover: rgba(42, 36, 28, 1);
+  --toggle-text: #e8dcc6;
+  --toggle-border: rgba(139, 115, 85, 0.4);
+  --text-primary: #e8dcc6;
+  --text-secondary: #c9b99b;
+  --text-tertiary: #8b7355;
+  --border-color: #4a3e2e;
+  --accent-color: #b8945f;
+  --success-color: #8b9a5b;
+  --form-bg: #352d23;
+  --card-bg: #3a3228;
+  --card-read-bg: #3a3528;
+  --card-shadow: rgba(0, 0, 0, 0.4);
+  --input-bg: #2a241c;
+  --input-border: #5c4a37;
+  --focus-shadow: rgba(184, 148, 95, 0.3);
+  --book-spine: #b8945f;
+  --paper-texture: none;
+  --btn-text: #faf8f3;
+  --btn-hover: #6b5a47;
+  --btn-shadow: rgba(44, 24, 16, 0.15);
+  --btn-shadow-inset: rgba(255, 255, 255, 0.3);
+}
+
+.minimal-light {
+  --bg-gradient-start: #ffffff;
+  --bg-gradient-end: #f5f5f5;
+  --header-text-color: #000000;
+  --main-bg: #ffffff;
+  --main-shadow: rgba(0, 0, 0, 0.1);
+  --toggle-bg: rgba(255, 255, 255, 0.95);
+  --toggle-bg-hover: rgba(255, 255, 255, 1);
+  --toggle-text: #000000;
+  --toggle-border: rgba(0, 0, 0, 0.2);
+  --text-primary: #000000;
+  --text-secondary: #333333;
+  --text-tertiary: #666666;
+  --border-color: #e0e0e0;
+  --accent-color: #000000;
+  --success-color: #000000;
+  --form-bg: #ffffff;
+  --card-bg: #ffffff;
+  --card-read-bg: #f9f9f9;
+  --card-shadow: rgba(0, 0, 0, 0.08);
+  --input-bg: #ffffff;
+  --input-border: #cccccc;
+  --focus-shadow: rgba(0, 0, 0, 0.1);
+  --book-spine: #000000;
+  --paper-texture: none;
+  --btn-text: #ffffff;
+  --btn-hover: #333333;
+  --btn-shadow: rgba(0, 0, 0, 0.1);
+  --btn-shadow-inset: none;
+}
+
+.minimal-dark {
+  --bg-gradient-start: #000000;
+  --bg-gradient-end: #1a1a1a;
+  --header-text-color: #ffffff;
+  --main-bg: #1a1a1a;
+  --main-shadow: rgba(0, 0, 0, 0.5);
+  --toggle-bg: rgba(26, 26, 26, 0.95);
+  --toggle-bg-hover: rgba(26, 26, 26, 1);
+  --toggle-text: #ffffff;
+  --toggle-border: rgba(255, 255, 255, 0.2);
+  --text-primary: #ffffff;
+  --text-secondary: #cccccc;
+  --text-tertiary: #999999;
+  --border-color: #333333;
+  --accent-color: #ffffff;
+  --success-color: #ffffff;
+  --form-bg: #1a1a1a;
+  --card-bg: #1a1a1a;
+  --card-read-bg: #222222;
+  --card-shadow: rgba(0, 0, 0, 0.5);
+  --input-bg: #000000;
+  --input-border: #444444;
+  --focus-shadow: rgba(255, 255, 255, 0.1);
+  --book-spine: #ffffff;
+  --paper-texture: none;
+  --btn-text: #000000;
+  --btn-hover: #e0e0e0;
+  --btn-shadow: rgba(0, 0, 0, 0.3);
+  --btn-shadow-inset: none;
+}
+
+.minimal-light,
+.minimal-dark {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+}
+
+.bookish-light,
+.bookish-dark {
+  font-family: 'Georgia', 'Times New Roman', serif;
+}
+
+body {
+  background-color: var(--main-bg);
+  color: var(--text-primary);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: var(--header-text-color);
+}

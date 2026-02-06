@@ -1,0 +1,183 @@
+<div class="book-form">
+  <div class="form-row">
+    <div class="form-group required">
+      <label for="title">Title</label>
+      <input 
+        type="text" 
+        id="title" 
+        [(ngModel)]="formData.title" 
+        placeholder="Enter book title"
+        required>
+    </div>
+    <div class="form-group required">
+      <label for="author">Author</label>
+      <input 
+        type="text" 
+        id="author" 
+        [(ngModel)]="formData.author" 
+        placeholder="Enter author name"
+        required>
+    </div>
+  </div>
+
+  <div class="form-row">
+    <div class="form-group">
+      <label for="status">Status</label>
+      <select id="status" [(ngModel)]="formData.status">
+        <option *ngFor="let status of statusOptions" [value]="status">{{ status }}</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Rating</label>
+      <div class="rating-buttons">
+        <button
+          type="button"
+          class="rating-btn"
+          [class.active]="formData.rating === BookRating.Positive"
+          [class.selected]="formData.rating === BookRating.Positive"
+          (click)="formData.rating = formData.rating === BookRating.Positive ? BookRating.None : BookRating.Positive"
+          [title]="getRatingLabel(BookRating.Positive)">
+          👍
+        </button>
+        <button
+          type="button"
+          class="rating-btn"
+          [class.active]="formData.rating === BookRating.Negative"
+          [class.selected]="formData.rating === BookRating.Negative"
+          (click)="formData.rating = formData.rating === BookRating.Negative ? BookRating.None : BookRating.Negative"
+          [title]="getRatingLabel(BookRating.Negative)">
+          👎
+        </button>
+        <button
+          type="button"
+          class="rating-btn"
+          [class.active]="formData.rating === BookRating.Favourite"
+          [class.selected]="formData.rating === BookRating.Favourite"
+          (click)="formData.rating = formData.rating === BookRating.Favourite ? BookRating.None : BookRating.Favourite"
+          [title]="getRatingLabel(BookRating.Favourite)">
+          ❤️
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-row">
+    <div class="form-group">
+      <label for="readingStartDate">Started</label>
+      <input 
+        type="date" 
+        id="readingStartDate" 
+        [value]="formatDateForInput(formData.readingStartDate)"
+        (change)="formData.readingStartDate = parseDateFromInput($any($event.target).value)">
+    </div>
+    <div class="form-group">
+      <label for="readingEndDate">Finished</label>
+      <input 
+        type="date" 
+        id="readingEndDate" 
+        [value]="formatDateForInput(formData.readingEndDate)"
+        (change)="formData.readingEndDate = parseDateFromInput($any($event.target).value)">
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="tags">Tags</label>
+    <div class="tags-input">
+      <input type="text" id="tags" [(ngModel)]="newTag" placeholder="Add a tag and press Enter" (keyup.enter)="addTag()">
+      <button type="button" class="btn btn-small" (click)="addTag()">Add Tag</button>
+    </div>
+    <div class="tags-list" *ngIf="formData.tags && formData.tags.length > 0">
+      <span class="tag" *ngFor="let tag of formData.tags">
+        {{ tag }}
+        <button type="button" class="tag-remove" (click)="removeTag(tag)">×</button>
+      </span>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="notes">Notes</label>
+    <textarea 
+      id="notes" 
+      [(ngModel)]="formData.notes" 
+      placeholder="Add your notes about this book..."
+      rows="4"></textarea>
+  </div>
+
+  <div class="form-group metadata-section">
+    <div class="metadata-section-header">
+      <button 
+        type="button" 
+        class="metadata-toggle-btn"
+        (click)="toggleMetadataSection()"
+        [attr.aria-expanded]="isMetadataExpanded">
+        <span class="metadata-toggle-icon" [class.expanded]="isMetadataExpanded">▼</span>
+        <span>Additional Metadata</span>
+      </button>
+      <button 
+        type="button" 
+        class="btn btn-small btn-primary metadata-lookup-btn"
+        (click)="lookupBookMetadata()"
+        [disabled]="isLookingUp || !formData.title?.trim() || !formData.author?.trim()">
+        {{ isLookingUp ? 'Looking up...' : '🔍 Lookup' }}
+      </button>
+    </div>
+    
+    <div class="metadata-section-content" *ngIf="isMetadataExpanded">
+      <div class="form-group">
+        <label for="publishedDate">Published Date</label>
+        <input type="date" id="publishedDate" [value]="formatDateForInput(formData.publishedDate)"
+          (change)="formData.publishedDate = parseDateFromInput($any($event.target).value)">
+      </div>
+
+      <div class="form-group">
+        <label for="coverImage">Cover Image</label>
+        <div class="image-input-section">
+          <div class="image-input-tabs">
+            <button type="button" class="tab-btn" [class.active]="imageInputMode === 'url'" (click)="imageInputMode = 'url'">
+              Image URL
+            </button>
+            <button type="button" class="tab-btn" [class.active]="imageInputMode === 'upload'"
+              (click)="imageInputMode = 'upload'">
+              Upload File
+            </button>
+          </div>
+      
+          <div class="image-input-content" *ngIf="imageInputMode === 'url'">
+            <input type="url" id="coverImageUrl" [(ngModel)]="imageUrlInput" placeholder="https://example.com/book-cover.jpg"
+              (blur)="onImageUrlChange()">
+            <button type="button" class="btn btn-small btn-clear-image" (click)="clearImage()" *ngIf="formData.imageUrl">
+              Clear Image
+            </button>
+          </div>
+      
+          <div class="image-input-content" *ngIf="imageInputMode === 'upload'">
+            <input type="file" id="coverImageFile" accept="image/*" (change)="onImageFileChange($event)">
+            <button type="button" class="btn btn-small btn-clear-image" (click)="clearImage()" *ngIf="formData.imageUrl">
+              Clear Image
+            </button>
+          </div>
+      
+          <div class="image-preview" *ngIf="formData.imageUrl">
+            <img [src]="formData.imageUrl" [alt]="'Cover preview'" (error)="onPreviewImageError()">
+            <button type="button" class="preview-remove" (click)="clearImage()" title="Remove image">×</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-actions">
+    <button 
+      class="btn btn-success" 
+      (click)="onSave()" 
+      [disabled]="!formData.title?.trim() || !formData.author?.trim() || isLoading">
+      {{ isLoading ? (book ? 'Updating...' : 'Adding...') : (book ? 'Update Book' : 'Add to List') }}
+    </button>
+    <button 
+      class="btn btn-secondary" 
+      (click)="onCancel()" 
+      [disabled]="isLoading">
+      Cancel
+    </button>
+  </div>
+</div>

@@ -1,0 +1,63 @@
+<div class="drawer-header">
+  <h2>Settings</h2>
+  <button class="drawer-close" (click)="close()" aria-label="Close">×</button>
+</div>
+<div class="drawer-content">
+  <div class="drawer-section">
+    <h3>Appearance</h3>
+    <div class="theme-select-wrapper">
+      <label for="theme-select" class="theme-select-label">Theme</label>
+      <select 
+        id="theme-select" 
+        class="theme-select"
+        [value]="themeService.getTheme()"
+        (change)="onThemeChange($any($event.target).value)">
+        <option value="bookish-light">Bookish Light</option>
+        <option value="bookish-dark">Bookish Dark</option>
+        <option value="minimal-light">Minimal Light</option>
+        <option value="minimal-dark">Minimal Dark</option>
+      </select>
+    </div>
+  </div>
+  <div class="drawer-section">
+    <h3>Data Management</h3>
+    <button class="drawer-btn expander-btn" (click)="toggleCsvSection()" title="CSV Import/Export">
+      <span class="drawer-icon">📊</span>
+      <span class="drawer-text">CSV Import/Export</span>
+      <span class="expander-icon">{{ isCsvExpanded ? '▼' : '▶' }}</span>
+    </button>
+    <div class="expander-content" *ngIf="isCsvExpanded">
+      <app-csv-import-export></app-csv-import-export>
+    </div>
+    <button class="drawer-btn expander-btn" (click)="toggleLookupDataSection()" title="Lookup Data">
+      <span class="drawer-icon">🔍</span>
+      <span class="drawer-text">Lookup Data</span>
+      <span class="expander-icon">{{ isLookupDataExpanded ? '▼' : '▶' }}</span>
+    </button>
+    <div class="expander-content" *ngIf="isLookupDataExpanded">
+      <div class="lookup-options">
+        <label class="lookup-option">
+          <input 
+            type="checkbox" 
+            [checked]="lookupOptions.covers"
+            (change)="toggleLookupOption('covers')">
+          <span class="lookup-label">Covers</span>
+        </label>
+        <label class="lookup-option">
+          <input 
+            type="checkbox" 
+            [checked]="lookupOptions.publicationDates"
+            (change)="toggleLookupOption('publicationDates')">
+          <span class="lookup-label">Publication dates</span>
+        </label>
+      </div>
+      <button 
+        class="lookup-btn" 
+        (click)="lookupData()" 
+        [disabled]="isLookingUpData || (!lookupOptions.covers && !lookupOptions.publicationDates)">
+        <span *ngIf="!isLookingUpData">🔍 Lookup</span>
+        <span *ngIf="isLookingUpData">⏳ Looking up...</span>
+      </button>
+    </div>
+  </div>
+</div>

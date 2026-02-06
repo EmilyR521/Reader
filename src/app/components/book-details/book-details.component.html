@@ -1,0 +1,82 @@
+<div class="drawer-header">
+    <h2>{{ book ? (isEditMode ? 'Edit Book' : book.title) : 'Add New Book' }}</h2>
+    <button class="drawer-close" (click)="close()" title="Close">×</button>
+  </div>
+
+  <div class="drawer-content">
+    <!-- View Mode -->
+    <div *ngIf="!isEditMode && book" class="book-view">
+      <div class="book-view-cover">
+        <div class="book-cover" [class.has-image]="book.imageUrl && !imageError">
+          <img 
+            *ngIf="book.imageUrl && !imageError" 
+            [src]="book.imageUrl" 
+            [alt]="book.title + ' cover'"
+            (error)="onImageError($event)">
+          <div *ngIf="!book.imageUrl || imageError" class="cover-placeholder">
+            <span class="placeholder-icon">📚</span>
+            <span class="placeholder-text">No Cover</span>
+          </div>
+        </div>
+      </div>
+      <div class="book-view-info">
+        <p class="author">by {{ book.author }}, {{ book.publishedDate | date:'yyyy' }}</p>
+        
+        <div class="book-view-details">        
+          <div class="detail-row">
+            <strong>Status:</strong>
+            <span class="status-badge" [class]="'status-' + book.status">{{ book.status }}</span>
+          </div>
+          <div class="detail-row" *ngIf="book.rating && book.rating !== BookRating.None">
+            <strong>Rating:</strong>
+            <span class="rating-display" [class]="'rating-' + book.rating">
+              <span class="rating-icon">
+                <span *ngIf="book.rating === BookRating.Positive">👍</span>
+                <span *ngIf="book.rating === BookRating.Negative">👎</span>
+                <span *ngIf="book.rating === BookRating.Favourite">❤️</span>
+              </span>
+              <span class="rating-label">
+                <span *ngIf="book.rating === BookRating.Positive">Thumbs Up</span>
+                <span *ngIf="book.rating === BookRating.Negative">Thumbs Down</span>
+                <span *ngIf="book.rating === BookRating.Favourite">Favourite</span>
+              </span>
+            </span>
+          </div>
+          <div class="detail-row" *ngIf="book.readingStartDate">
+            <strong>Started:</strong>
+            <span>{{ book.readingStartDate | date:'mediumDate' }}</span>
+          </div>
+          <div class="detail-row" *ngIf="book.readingEndDate">
+            <strong>Finished:</strong>
+            <span>{{ book.readingEndDate | date:'mediumDate' }}</span>
+          </div>
+          <div class="detail-row" *ngIf="book.tags && book.tags.length > 0">
+            <strong>Tags:</strong>
+            <span class="book-tags">
+              <span class="tag-display" *ngFor="let tag of book.tags">{{ tag }}</span>
+            </span>
+          </div>
+          <div class="detail-row" *ngIf="book.notes">
+            <strong>Notes:</strong>
+            <span class="notes-text">{{ book.notes }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="book-view-actions">
+        <button class="btn btn-primary" (click)="toggleEditMode()">Edit</button>
+        <button class="btn btn-danger" (click)="deleteBook()" [disabled]="isLoading">
+          {{ isLoading ? 'Deleting...' : 'Delete' }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Edit/Add Mode -->
+    <app-book-details-form
+      *ngIf="isEditMode || !book"
+      [book]="book"
+      [isLoading]="isLoading"
+      (save)="onFormSave($event)"
+      (cancel)="onFormCancel()">
+    </app-book-details-form>
+  </div>

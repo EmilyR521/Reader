@@ -1,0 +1,24 @@
+<div class="timeline-container">
+  <app-timeline-header 
+    [books]="books">
+  </app-timeline-header>
+
+  <div class="books-list" *ngIf="timelineGroups.length > 0; else emptyState">
+    <div *ngFor="let group of timelineGroups" class="timeline-month-group">
+      <div class="month-divider">
+        <span class="month-label">{{ group.monthLabel }}</span>
+      </div>
+      <app-book-item 
+        *ngFor="let book of group.books"
+        [book]="book"
+        (view)="onViewBook($any($event))">
+      </app-book-item>
+    </div>
+  </div>
+
+  <ng-template #emptyState>
+    <div class="empty-state">
+      <p>Your reading list is empty. Add your first book to get started!</p>
+    </div>
+  </ng-template>
+</div>

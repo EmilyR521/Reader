@@ -1,0 +1,50 @@
+.graph-view-container {
+  width: 100%;
+  padding: 20px;
+  overflow-x: auto;
+}
+
+.chart-container {
+  width: 100%;
+  min-height: 400px;
+}
+
+.chart-container svg {
+  display: block;
+}
+
+.chart-container .x-axis text {
+  fill: var(--text-secondary);
+  font-size: 0.85rem;
+}
+
+.chart-container .x-axis path,
+.chart-container .x-axis line {
+  stroke: var(--border-color);
+}
+
+.chart-container .bar-label {
+  fill: var(--text-primary);
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.chart-container .axis-label {
+  fill: var(--text-primary);
+  font-weight: 600;
+}
+
+.chart-tooltip {
+  font-size: 0.85rem;
+  color: var(--text-primary);
+  line-height: 1.6;
+}
+
+.chart-tooltip strong {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.chart-tooltip small {
+  color: var(--text-secondary);
+}

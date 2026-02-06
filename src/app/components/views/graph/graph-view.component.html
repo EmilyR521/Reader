@@ -1,0 +1,12 @@
+<div class="graph-view-container">
+  <app-filter-controls
+    [books]="books"
+    mode="graph"
+    (filtersChanged)="onFiltersChanged($event)">
+  </app-filter-controls>
+  <div *ngIf="filteredBooks.length === 0" class="empty-state">
+    <p *ngIf="hasYearFilter">No books match the selected year.</p>
+    <p *ngIf="!hasYearFilter">No books with reading dates to display. Start reading a book to see it on the timeline!</p>
+  </div>
+  <div #chartContainer class="chart-container" *ngIf="filteredBooks.length > 0"></div>
+</div>

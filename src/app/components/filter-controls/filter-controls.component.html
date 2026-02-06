@@ -1,0 +1,183 @@
+<!-- Graph Mode: Year Quick Filters -->
+<div class="filter-controls" *ngIf="mode === 'graph'">
+  <div class="filter-header">
+    <button class="filter-toggle-btn" (click)="toggleGraphExpander()">
+      <span class="filter-toggle-icon" [class.expanded]="isGraphExpanded">▼</span>
+      <span>Filters</span>
+    </button>
+    <div class="active-filters-inline" *ngIf="hasActiveFilters">
+      <span class="filter-lozenge" *ngFor="let filter of activeFilters">
+        {{ filter.label }}
+        <button class="filter-remove" (click)="removeFilter(filter)" title="Remove filter">×</button>
+      </span>
+      <button class="clear-all-btn" (click)="clearAllFilters()">Clear All</button>
+    </div>
+  </div>
+  <div class="filter-expander-content" *ngIf="isGraphExpanded">
+    <div class="graph-filter-inputs">
+      <div class="filter-input-group">
+        <label>Date Range</label>
+        <div class="date-range-inputs">
+          <input
+            type="date"
+            id="dateRangeStart"
+            [(ngModel)]="dateRangeStart"
+            (change)="onDateRangeChange()"
+            placeholder="Start date">
+          <span class="date-range-separator">to</span>
+          <input
+            type="date"
+            id="dateRangeEnd"
+            [(ngModel)]="dateRangeEnd"
+            (change)="onDateRangeChange()"
+            placeholder="End date">
+        </div>
+        <small class="filter-help-text">Select a custom date range, or use quick filters below</small>
+      </div>
+      <div class="filter-input-group" *ngIf="availableYears.length > 0">
+        <label>Quick Filters (Year)</label>
+        <div class="year-filter-buttons">
+          <button
+            *ngFor="let year of availableYears"
+            class="year-filter-btn"
+            [class.active]="selectedYear === year"
+            (click)="filterByYear(year)">
+            {{ year }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Table Mode: Column Filters -->
+<div class="filter-controls" *ngIf="mode === 'table'">
+  <div class="filter-header">
+    <button class="filter-toggle-btn" (click)="toggleExpander()">
+      <span class="filter-toggle-icon" [class.expanded]="isExpanded">▼</span>
+      <span>Filters</span>
+    </button>
+    <div class="active-filters-inline" *ngIf="hasActiveFilters">
+      <span class="filter-lozenge" *ngFor="let filter of activeFilters">
+        {{ filter.label }}
+        <button class="filter-remove" (click)="removeFilter(filter)" title="Remove filter">×</button>
+      </span>
+      <button class="clear-all-btn" (click)="clearAllFilters()">Clear All</button>
+    </div>
+  </div>
+  <div class="filter-expander-content" *ngIf="isExpanded">
+    <div class="table-filter-inputs">
+      <div class="filter-input-group">
+        <label for="titleFilter">Title</label>
+        <input
+          type="text"
+          id="titleFilter"
+          [(ngModel)]="titleFilter"
+          (input)="onTitleFilterChange($any($event.target).value)"
+          placeholder="Filter by title...">
+      </div>
+      <div class="filter-input-group">
+        <label for="authorFilter">Author</label>
+        <input
+          type="text"
+          id="authorFilter"
+          [(ngModel)]="authorFilter"
+          (input)="onAuthorFilterChange($any($event.target).value)"
+          placeholder="Filter by author...">
+      </div>
+      <div class="filter-input-group">
+        <label>Status</label>
+        <button class="multiselect-toggle" (click)="toggleStatusDropdown()" [class.active]="showStatusDropdown || selectedStatuses.size > 0">
+          <span>{{ selectedStatuses.size > 0 ? selectedStatuses.size + ' selected' : 'Select statuses...' }}</span>
+          <span class="dropdown-icon">{{ showStatusDropdown ? '▲' : '▼' }}</span>
+        </button>
+        <div class="multiselect-dropdown" *ngIf="showStatusDropdown">
+          <div class="multiselect-search" *ngIf="availableStatuses.length > 5">
+            <input
+              type="text"
+              #statusSearch
+              placeholder="Search statuses..."
+              (input)="filterStatuses($any($event.target).value)">
+          </div>
+          <div class="multiselect-list">
+            <label
+              *ngFor="let status of filteredStatuses"
+              class="multiselect-item"
+              [class.selected]="isStatusSelected(status)">
+              <input
+                type="checkbox"
+                [checked]="isStatusSelected(status)"
+                (change)="toggleStatus(status)">
+              <span>{{ status }}</span>
+            </label>
+            <div *ngIf="filteredStatuses.length === 0" class="multiselect-empty">
+              No statuses found
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="filter-input-group">
+        <label>Tags</label>
+        <button class="multiselect-toggle" (click)="toggleTagsDropdown()" [class.active]="showTagsDropdown || selectedTags.size > 0">
+          <span>{{ selectedTags.size > 0 ? selectedTags.size + ' selected' : 'Select tags...' }}</span>
+          <span class="dropdown-icon">{{ showTagsDropdown ? '▲' : '▼' }}</span>
+        </button>
+        <div class="multiselect-dropdown" *ngIf="showTagsDropdown">
+          <div class="multiselect-search" *ngIf="availableTags.length > 5">
+            <input
+              type="text"
+              #tagSearch
+              placeholder="Search tags..."
+              (input)="filterTags($any($event.target).value)">
+          </div>
+          <div class="multiselect-list">
+            <label
+              *ngFor="let tag of filteredTags"
+              class="multiselect-item"
+              [class.selected]="isTagSelected(tag)">
+              <input
+                type="checkbox"
+                [checked]="isTagSelected(tag)"
+                (change)="toggleTag(tag)">
+              <span>{{ tag }}</span>
+            </label>
+            <div *ngIf="filteredTags.length === 0" class="multiselect-empty">
+              No tags found
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="filter-input-group" *ngIf="tableAvailableYears.length > 0">
+        <label>Quick Filters (Year)</label>
+        <div class="year-filter-buttons">
+          <button
+            *ngFor="let year of tableAvailableYears"
+            class="year-filter-btn"
+            [class.active]="tableSelectedYear === year"
+            (click)="filterByTableYear(year)">
+            {{ year }}
+          </button>
+        </div>
+      </div>
+      <div class="filter-input-group">
+        <label>Date Range</label>
+        <div class="date-range-inputs">
+          <input
+            type="date"
+            id="tableDateRangeStart"
+            [(ngModel)]="tableDateRangeStart"
+            (change)="onTableDateRangeChange()"
+            placeholder="Start date">
+          <span class="date-range-separator">to</span>
+          <input
+            type="date"
+            id="tableDateRangeEnd"
+            [(ngModel)]="tableDateRangeEnd"
+            (change)="onTableDateRangeChange()"
+            placeholder="End date">
+        </div>
+        <small class="filter-help-text">Select a custom date range, or use quick filters above</small>
+      </div>
+    </div>
+  </div>
+</div>

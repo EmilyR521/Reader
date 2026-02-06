@@ -1,0 +1,51 @@
+<div class="app-container" [class.table-view-active]="currentView === 'table'">
+  <header>
+    <div class="header-actions">
+      <button class="settings-btn" (click)="toggleSettingsDrawer()" title="Settings">
+        <span class="icon">⚙️</span>
+      </button>
+    </div>
+    <h1>{{ title }}</h1>
+  </header>
+  <div class="toolbar-container">
+    <app-view-toolbar (viewChange)="onViewChange($event)"></app-view-toolbar>
+    <app-action-toolbar 
+      [currentView]="currentView"
+      (addBook)="onAddBook()">
+    </app-action-toolbar>
+  </div>
+  <main>
+    <app-timeline 
+      *ngIf="currentView === 'timeline'"
+      (viewBook)="onViewBook($event)">
+    </app-timeline>
+    <app-table-view 
+      *ngIf="currentView === 'table'"
+      (viewBook)="onViewBook($event)">
+    </app-table-view>
+    <app-graph-view 
+      *ngIf="currentView === 'graph'"
+      (viewBook)="onViewBook($event)">
+    </app-graph-view>
+  </main>
+
+  <!-- Settings Drawer -->
+  <div class="drawer-overlay" *ngIf="showSettingsDrawer" (click)="closeSettingsDrawer()"></div>
+  <div class="settings-drawer" [class.open]="showSettingsDrawer">
+    <app-settings-drawer
+      (drawerClose)="closeSettingsDrawer()">
+    </app-settings-drawer>
+  </div>
+
+  <!-- Book Details Drawer -->
+  <div class="drawer-overlay" *ngIf="isBookDetailsOpen" (click)="onBookDetailsClosed()"></div>
+  <div class="book-details-drawer" [class.open]="isBookDetailsOpen">
+    <app-book-details
+      [book]="selectedBook"
+      [isOpen]="isBookDetailsOpen"
+      (closed)="onBookDetailsClosed()"
+      (bookSaved)="onBookSaved()"
+      (bookDeleted)="onBookDeleted($event)">
+    </app-book-details>
+  </div>
+</div>
