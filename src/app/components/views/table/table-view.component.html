@@ -1,0 +1,83 @@
+<div class="table-view-container">
+  <app-filter-controls
+    [books]="books"
+    mode="table"
+    (filtersChanged)="onFiltersChanged($event)"
+    #filterControls>
+  </app-filter-controls>
+  <div class="table-wrapper">
+    <table class="books-table">
+      <thead>
+        <tr>
+          <th class="sortable" (click)="sortBy('title')">
+            Title <span class="sort-icon">{{ getSortIcon('title') }}</span>
+          </th>
+          <th class="sortable" (click)="sortBy('author')">
+            Author <span class="sort-icon">{{ getSortIcon('author') }}</span>
+          </th>
+          <th class="sortable" (click)="sortBy('status')">
+            Status <span class="sort-icon">{{ getSortIcon('status') }}</span>
+          </th>
+          <th class="sortable" (click)="sortBy('readingStartDate')">
+            Started <span class="sort-icon">{{ getSortIcon('readingStartDate') }}</span>
+          </th>
+          <th class="sortable" (click)="sortBy('readingEndDate')">
+            Finished <span class="sort-icon">{{ getSortIcon('readingEndDate') }}</span>
+          </th>
+          <th class="sortable" (click)="sortBy('rating')">
+            Rating <span class="sort-icon">{{ getSortIcon('rating') }}</span>
+          </th>
+          <th>Tags</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let book of sortedBooks" [class]="'status-' + book.status">
+          <td class="title-cell clickable-title" (click)="onViewBook(book)">{{ book.title }}</td>
+          <td class="clickable-author" (click)="filterControls.filterByAuthor(book.author, $event)" [title]="'Click to filter by ' + book.author">{{ book.author }}</td>
+          <td class="clickable-status" (click)="filterControls.filterByStatus(book.status, $event)" [title]="'Click to filter by ' + book.status">
+            <span class="status-badge" [class]="'status-' + book.status">{{ book.status }}</span>
+          </td>
+          <td class="date-cell">
+            {{ book.readingStartDate ? (book.readingStartDate | date:'shortDate') : '—' }}
+          </td>
+          <td class="date-cell">
+            {{ book.readingEndDate ? (book.readingEndDate | date:'shortDate') : '—' }}
+          </td>
+          <td class="rating-cell">
+            <span *ngIf="book.rating && book.rating !== BookRating.None" class="rating-icon-display" [class]="'rating-' + book.rating" [title]="getRatingLabel(book.rating)">
+              <span *ngIf="book.rating === BookRating.Positive">👍</span>
+              <span *ngIf="book.rating === BookRating.Negative">👎</span>
+              <span *ngIf="book.rating === BookRating.Favourite">❤️</span>
+            </span>
+            <span *ngIf="!book.rating || book.rating === BookRating.None" class="empty">—</span>
+          </td>
+          <td class="tags-cell">
+            <span 
+              *ngFor="let tag of book.tags" 
+              class="tag clickable-tag"
+              (click)="filterControls.filterByTag(tag, $event)"
+              [title]="'Click to filter by ' + tag">
+              {{ tag }}
+            </span>
+            <span *ngIf="!book.tags || book.tags.length === 0" class="empty">—</span>
+          </td>
+        </tr>
+        <tr *ngIf="sortedBooks.length === 0" class="empty-row">
+          <td colspan="7" class="empty-message">
+            {{ activeFilters.length > 0 ? 'No books match the selected filters' : 'No books in your reading list' }}
+          </td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr class="table-footer">
+          <td colspan="7">
+            <span class="row-count">{{ sortedBooks.length }} {{ sortedBooks.length === 1 ? 'book' : 'books' }}</span>
+            <span *ngIf="activeFilters.length > 0" class="filter-indicator">
+              (filtered from {{ books.length }} total)
+            </span>
+          </td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+</div>
