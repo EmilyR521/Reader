@@ -2,15 +2,20 @@
   width: 100%;
   padding: 20px;
   overflow-x: auto;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
 }
 
 .chart-container {
   width: 100%;
+  min-width: 800px; /* Minimum width to ensure chart is readable */
   min-height: 400px;
+  position: relative;
 }
 
 .chart-container svg {
   display: block;
+  min-width: 800px; /* Ensure SVG maintains minimum width */
 }
 
 .chart-container .x-axis text {
@@ -47,4 +52,43 @@
 
 .chart-tooltip small {
   color: var(--text-secondary);
+}
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+  .graph-view-container {
+    padding: 15px 10px;
+  }
+
+  .chart-container {
+    min-width: 700px;
+    min-height: 350px;
+  }
+
+  .chart-container svg {
+    min-width: 700px;
+  }
+}
+
+@media (max-width: 480px) {
+  .graph-view-container {
+    padding: 10px 5px;
+  }
+
+  .chart-container {
+    min-width: 600px;
+    min-height: 300px;
+  }
+
+  .chart-container svg {
+    min-width: 600px;
+  }
+
+  .chart-container .x-axis text {
+    font-size: 0.75rem;
+  }
+
+  .chart-container .bar-label {
+    font-size: 0.75rem;
+  }
 }

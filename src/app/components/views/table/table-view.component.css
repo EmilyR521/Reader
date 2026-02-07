@@ -8,6 +8,7 @@
 /* Table styles */
 .table-wrapper {
   width: 100%;
+  overflow-x: auto;
   overflow-y: auto;
   background: var(--main-bg);
   border-radius: 8px;
@@ -17,10 +18,12 @@
     0 2px 8px rgba(44, 24, 16, 0.08);
   position: relative;
   max-height: calc(72vh - 60px);
+  -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
 }
 
 .books-table {
   width: 100%;
+  min-width: 800px; /* Minimum width to ensure all columns are visible */
   border-collapse: collapse;
   font-size: 0.9rem;
   table-layout: fixed;
@@ -267,4 +270,50 @@
   font-weight: normal;
   margin-left: 8px;
   font-size: 0.85rem;
+}
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+  .table-view-container {
+    height: auto;
+    min-height: 50vh;
+  }
+
+  .table-wrapper {
+    max-height: calc(100vh - 300px);
+    border-radius: 4px;
+  }
+
+  .books-table {
+    font-size: 0.8rem;
+  }
+
+  .books-table th,
+  .books-table td {
+    padding: 8px 10px;
+  }
+
+  .books-table th {
+    font-size: 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .books-table {
+    min-width: 700px; /* Slightly smaller minimum for very small screens */
+    font-size: 0.75rem;
+  }
+
+  .books-table th,
+  .books-table td {
+    padding: 6px 8px;
+  }
+
+  .books-table th {
+    font-size: 0.7rem;
+  }
+
+  .title-cell {
+    max-width: 150px;
+  }
 }

@@ -184,7 +184,9 @@ export class GraphViewComponent implements OnInit, OnDestroy, AfterViewInit {
 
     // Calculate dimensions
     const container = this.chartContainer.nativeElement;
-    this.width = container.offsetWidth || 1200;
+    const containerWidth = container.offsetWidth || 1200;
+    // Use minimum width of 800px for readability, but allow container to be smaller for scrolling
+    this.width = Math.max(800, containerWidth);
     this.height = Math.max(400, this.filteredBooks.length * 20 + 100); // Reduced band height to 50% (was 40, now 20)
     this.chartWidth = this.width - this.margin.left - this.margin.right;
     this.chartHeight = this.height - this.margin.top - this.margin.bottom;

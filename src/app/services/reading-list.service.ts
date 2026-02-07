@@ -1,8 +1,10 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { BehaviorSubject, Observable, catchError, tap, throwError } from 'rxjs';
 import { Book } from '../models/book.model';
-import { BookStatus } from '../models/book-status.model'; 
+import { BookStatus } from '../models/book-status.model';
+import { UserService } from './user.service';
+
 @Injectable({
   providedIn: 'root'
 })
@@ -11,9 +13,17 @@ export class ReadingListService {
   private booksSubject = new BehaviorSubject<Book[]>([]);
   public books$: Observable<Book[]> = this.booksSubject.asObservable();
 
-  constructor(private http: HttpClient) {
+  constructor(
+    private http: HttpClient,
+    private userService: UserService
+  ) {
     // Load books from server on initialization
     this.loadBooks();
+    
+    // Reload books when user changes
+    this.userService.currentUser$.subscribe(() => {
+      this.loadBooks();
+    });
   }
 
   getBooks(): Book[] {
@@ -21,7 +31,10 @@ export class ReadingListService {
   }
 
   loadBooks(): void {
-    this.http.get<Book[]>(this.API_URL)
+    const user = this.userService.getCurrentUser();
+    const params = new HttpParams().set('user', user);
+    
+    this.http.get<Book[]>(this.API_URL, { params })
       .pipe(
         tap(books => {
           const parsedBooks = books.map(book => ({
@@ -42,7 +55,10 @@ export class ReadingListService {
   }
 
   addBook(book: Omit<Book, 'id' | 'addedDate'>): Observable<Book> {
-    return this.http.post<Book>(this.API_URL, book)
+    const user = this.userService.getCurrentUser();
+    const params = new HttpParams().set('user', user);
+    
+    return this.http.post<Book>(this.API_URL, book, { params })
       .pipe(
         tap(newBook => {
           const books = this.getBooks();
@@ -65,7 +81,10 @@ export class ReadingListService {
   }
 
   removeBook(id: string): Observable<void> {
-    return this.http.delete<void>(`${this.API_URL}/${id}`)
+    const user = this.userService.getCurrentUser();
+    const params = new HttpParams().set('user', user);
+    
+    return this.http.delete<void>(`${this.API_URL}/${id}`, { params })
       .pipe(
         tap(() => {
           const books = this.getBooks().filter(book => book.id !== id);
@@ -79,7 +98,10 @@ export class ReadingListService {
   }
 
   updateBook(id: string, updates: Partial<Book>): Observable<Book> {
-    return this.http.put<Book>(`${this.API_URL}/${id}`, updates)
+    const user = this.userService.getCurrentUser();
+    const params = new HttpParams().set('user', user);
+    
+    return this.http.put<Book>(`${this.API_URL}/${id}`, updates, { params })
       .pipe(
         tap(updatedBook => {
           const books = this.getBooks();

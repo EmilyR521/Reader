@@ -5,3 +5,17 @@
   max-width:800px;
   margin: 0 auto;
 }
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+  .timeline-container {
+    max-width: 100%;
+    padding: 0 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .timeline-container {
+    padding: 0 5px;
+  }
+}

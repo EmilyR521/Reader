@@ -9,6 +9,26 @@ header {
   position: relative;
 }
 
+@media (max-width: 768px) {
+  header {
+    padding-top: 15px;
+  }
+
+  header h1 {
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  header {
+    padding-top: 10px;
+  }
+
+  header h1 {
+    font-size: 1.25rem;
+  }
+}
+
 .toolbar-container {
   display: flex;
   align-items: center;
@@ -17,6 +37,23 @@ header {
   margin-bottom: 30px;
   padding: 15px 0;
   border-bottom: 2px solid var(--border-color);
+}
+
+@media (max-width: 768px) {
+  .toolbar-container {
+    gap: 10px;
+    margin-bottom: 20px;
+    padding: 10px 0;
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 480px) {
+  .toolbar-container {
+    gap: 8px;
+    margin-bottom: 15px;
+    padding: 8px 0;
+  }
 }
 
 .header-actions {
@@ -58,6 +95,19 @@ main {
   transition: background 0.3s ease, box-shadow 0.3s ease;
   border: 1px solid var(--border-color);
   position: relative;
+}
+
+@media (max-width: 768px) {
+  main {
+    padding: 20px 15px;
+    border-radius: 4px;
+  }
+}
+
+@media (max-width: 480px) {
+  main {
+    padding: 15px 10px;
+  }
 }
 
 
