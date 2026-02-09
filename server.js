@@ -21,12 +21,24 @@ function getUserDataFile(user) {
 // Ensure data directory exists
 async function ensureDataDirectory() {
   try {
+    // Create data directory if it doesn't exist (recursive: true creates parent dirs if needed)
     await fs.mkdir(DATA_DIR, { recursive: true });
+    console.log(`✓ Data directory ensured: ${DATA_DIR}`);
+    
+    // Verify the directory exists and is accessible
+    try {
+      await fs.access(DATA_DIR);
+      console.log(`✓ Data directory is accessible`);
+    } catch (accessError) {
+      console.error('✗ Data directory exists but is not accessible:', accessError);
+      throw new Error(`Data directory ${DATA_DIR} is not accessible`);
+    }
     
     // Ensure default user file exists
     const defaultFile = getUserDataFile(DEFAULT_USER);
     try {
       await fs.access(defaultFile);
+      console.log(`✓ Default user file exists: ${defaultFile}`);
     } catch {
       // File doesn't exist, create with new format
       const newData = {
@@ -38,9 +50,12 @@ async function ensureDataDirectory() {
         collections: []
       };
       await fs.writeFile(defaultFile, JSON.stringify(newData, null, 2), 'utf8');
+      console.log(`✓ Created default user file: ${defaultFile}`);
     }
   } catch (error) {
-    console.error('Error setting up data directory:', error);
+    console.error('✗ Error setting up data directory:', error);
+    console.error('  This is a critical error. The server may not function correctly.');
+    throw error; // Re-throw to prevent server from starting with invalid state
   }
 }
 
@@ -541,11 +556,19 @@ app.get('/api/health', (req, res) => {
 
 // Start server
 async function startServer() {
-  await ensureDataDirectory();
-  app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
-    console.log(`Data directory: ${DATA_DIR}`);
-  });
+  try {
+    // Ensure data directory exists before starting server
+    await ensureDataDirectory();
+    
+    app.listen(PORT, () => {
+      console.log(`\n✓ Server is running on http://localhost:${PORT}`);
+      console.log(`✓ Data directory: ${DATA_DIR}\n`);
+    });
+  } catch (error) {
+    console.error('\n✗ Failed to start server:', error);
+    console.error('  Please check that the data directory can be created and is writable.');
+    process.exit(1); // Exit with error code
+  }
 }
 
 startServer().catch(console.error);
