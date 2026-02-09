@@ -4,7 +4,7 @@ import { Book } from '../../../models/book.model';
 import { BookStatus } from '../../../models/book-status.model';
 import { Subscription } from 'rxjs';
 import * as d3 from 'd3';
-import { ActiveFilter } from '../../filter-controls/filter-controls.component';
+import { ActiveFilter, FilterControlsComponent } from '../../filter-controls/filter-controls.component';
 
 interface BookBar {
   book: Book;
@@ -20,6 +20,7 @@ interface BookBar {
 })
 export class GraphViewComponent implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild('chartContainer', { static: false }) chartContainer!: ElementRef;
+  @ViewChild('filterControls', { static: false }) filterControls!: FilterControlsComponent;
   @Output() viewBook = new EventEmitter<Book>();
   
   books: Book[] = [];
@@ -30,6 +31,7 @@ export class GraphViewComponent implements OnInit, OnDestroy, AfterViewInit {
   dateRangeEnd: string | null = null;
   private booksSubscription?: Subscription;
   private resizeListener?: () => void;
+  private hasAutoAppliedYearFilter = false;
   
   private svg: any;
   private margin = { top: 20, right: 200, bottom: 60, left: 30 };
@@ -43,6 +45,7 @@ export class GraphViewComponent implements OnInit, OnDestroy, AfterViewInit {
   ngOnInit(): void {
     this.booksSubscription = this.readingListService.books$.subscribe(books => {
       this.books = books;
+      
       this.filterBooks();
       if (this.chartContainer) {
         this.renderChart();
@@ -53,6 +56,14 @@ export class GraphViewComponent implements OnInit, OnDestroy, AfterViewInit {
   ngAfterViewInit(): void {
     setTimeout(() => {
       this.renderChart();
+      
+      // Auto-apply current year filter if filter controls are available and not already applied
+      // Use a small delay to ensure filter controls have processed the books input
+      setTimeout(() => {
+        if (!this.hasAutoAppliedYearFilter && this.books.length > 0 && this.filterControls) {
+          this.applyCurrentYearFilter();
+        }
+      }, 100);
     }, 0);
     
     // Re-render on window resize
@@ -62,6 +73,47 @@ export class GraphViewComponent implements OnInit, OnDestroy, AfterViewInit {
       }
     };
     window.addEventListener('resize', this.resizeListener);
+  }
+  
+  private applyCurrentYearFilter(): void {
+    if (this.hasAutoAppliedYearFilter || !this.filterControls) {
+      return;
+    }
+    
+    const currentYear = new Date().getFullYear();
+    
+    // Check if current year is in available years
+    // The filter controls component extracts years in ngOnChanges, so we may need to wait
+    if (this.filterControls.availableYears && this.filterControls.availableYears.length > 0) {
+      if (this.filterControls.availableYears.includes(currentYear)) {
+        // Only apply if no filter is currently active
+        if (this.selectedYear === null && !this.dateRangeStart && !this.dateRangeEnd) {
+          this.filterControls.filterByYear(currentYear);
+          this.hasAutoAppliedYearFilter = true;
+        }
+      }
+    } else {
+      // If years haven't been extracted yet, check if current year exists in books and try again
+      const hasCurrentYear = this.books.some(book => {
+        const startDate = this.parseDate(book.readingStartDate);
+        const endDate = this.parseDate(book.readingEndDate);
+        if (startDate && startDate.getFullYear() === currentYear) return true;
+        if (endDate && endDate.getFullYear() === currentYear) return true;
+        return false;
+      });
+      
+      if (hasCurrentYear) {
+        // Try again after a short delay to allow filter controls to process
+        setTimeout(() => {
+          if (!this.hasAutoAppliedYearFilter && this.filterControls && this.filterControls.availableYears && this.filterControls.availableYears.includes(currentYear)) {
+            if (this.selectedYear === null && !this.dateRangeStart && !this.dateRangeEnd) {
+              this.filterControls.filterByYear(currentYear);
+              this.hasAutoAppliedYearFilter = true;
+            }
+          }
+        }, 200);
+      }
+    }
   }
 
   ngOnDestroy(): void {

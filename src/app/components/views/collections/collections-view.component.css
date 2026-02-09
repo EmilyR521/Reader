@@ -387,3 +387,34 @@
     font-size: 1.2rem;
   }
 }
+
+/* Context Menu Styles */
+.context-menu {
+  position: fixed;
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  min-width: 200px;
+  padding: 4px 0;
+  font-size: 0.9rem;
+}
+
+.context-menu-item {
+  position: relative;
+}
+
+.context-menu-label {
+  padding: 8px 16px;
+  color: var(--text-primary);
+  font-weight: 500;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.2s ease;
+}
+
+.context-menu-item:hover .context-menu-label {
+  background: var(--form-bg);
+  color: var(--accent-color);
+}

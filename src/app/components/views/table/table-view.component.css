@@ -417,13 +417,19 @@
   position: relative;
 }
 
+.context-menu-item:not(.context-menu-item-disabled):hover .context-menu-label {
+  background: var(--form-bg);
+  color: var(--accent-color);
+}
+
 .context-menu-label {
   padding: 8px 16px;
   color: var(--text-primary);
   font-weight: 500;
-  cursor: default;
+  cursor: pointer;
   user-select: none;
   position: relative;
+  transition: background 0.2s ease;
 }
 
 /* Invisible bridge to maintain hover when moving to submenu */

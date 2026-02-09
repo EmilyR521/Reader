@@ -1,5 +1,6 @@
 <div class="graph-view-container">
   <app-filter-controls
+    #filterControls
     [books]="books"
     mode="graph"
     (filtersChanged)="onFiltersChanged($event)">

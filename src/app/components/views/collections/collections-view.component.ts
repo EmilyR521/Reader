@@ -25,6 +25,12 @@ export class CollectionsViewComponent implements OnInit, OnDestroy {
   bookSearchTerms: { [collectionId: string]: string } = {};
   showBookDropdown: { [collectionId: string]: boolean } = {};
   
+  // Context menu state
+  contextMenuVisible = false;
+  contextMenuX = 0;
+  contextMenuY = 0;
+  selectedBookForMenu: Book | null = null;
+  
   @Output() viewBook = new EventEmitter<Book>();
   
   BookStatus = BookStatus;
@@ -69,6 +75,18 @@ export class CollectionsViewComponent implements OnInit, OnDestroy {
       Object.keys(this.showBookDropdown).forEach(collectionId => {
         this.showBookDropdown[collectionId] = false;
       });
+    }
+    // Close context menu when clicking outside
+    if (this.contextMenuVisible && !target.closest('.context-menu')) {
+      this.closeContextMenu();
+    }
+  }
+
+  @HostListener('document:contextmenu', ['$event'])
+  onDocumentRightClick(event: MouseEvent): void {
+    // Close context menu when right-clicking elsewhere
+    if (this.contextMenuVisible) {
+      this.closeContextMenu();
     }
   }
 
@@ -204,5 +222,49 @@ export class CollectionsViewComponent implements OnInit, OnDestroy {
   clearBookSearch(collectionId: string): void {
     this.bookSearchTerms[collectionId] = '';
     this.showBookDropdown[collectionId] = false;
+  }
+
+  onBookRightClick(event: MouseEvent, book: Book): void {
+    event.preventDefault();
+    event.stopPropagation();
+    
+    this.selectedBookForMenu = book;
+    
+    // Position context menu, ensuring it stays within viewport
+    const menuWidth = 200;
+    const menuHeight = 100;
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+    
+    // Adjust X position if menu would go off right edge
+    let x = event.clientX;
+    if (x + menuWidth > viewportWidth) {
+      x = viewportWidth - menuWidth - 10;
+    }
+    
+    // Adjust Y position if menu would go off bottom edge
+    let y = event.clientY;
+    if (y + menuHeight > viewportHeight) {
+      y = viewportHeight - menuHeight - 10;
+    }
+    
+    this.contextMenuX = x;
+    this.contextMenuY = y;
+    this.contextMenuVisible = true;
+  }
+
+  closeContextMenu(): void {
+    this.contextMenuVisible = false;
+    this.selectedBookForMenu = null;
+  }
+
+  findOnWoB(book: Book): void {
+    if (!book || !book.title) {
+      return;
+    }
+    const searchQuery = encodeURIComponent(book.title);
+    const url = `https://www.worldofbooks.com/en-gb/search?q=${searchQuery}`;
+    window.open(url, '_blank');
+    this.closeContextMenu();
   }
 }

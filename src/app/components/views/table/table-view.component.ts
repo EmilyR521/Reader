@@ -413,6 +413,16 @@ export class TableViewComponent implements OnInit, OnDestroy {
     return this.collections.filter(collection => !collection.bookIds.includes(this.selectedBook!.id));
   }
 
+  findOnWoB(book: Book): void {
+    if (!book || !book.title) {
+      return;
+    }
+    const searchQuery = encodeURIComponent(book.title);
+    const url = `https://www.worldofbooks.com/en-gb/search?q=${searchQuery}`;
+    window.open(url, '_blank');
+    this.closeContextMenu();
+  }
+
   toggleFooterCollectionMenu(): void {
     this.showFooterCollectionMenu = !this.showFooterCollectionMenu;
   }

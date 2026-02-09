@@ -44,7 +44,7 @@
 
       <div class="collection-books">
         <div *ngIf="collectionWithBooks.books.length > 0" class="books-list">
-          <div *ngFor="let book of collectionWithBooks.books" class="book-item">
+          <div *ngFor="let book of collectionWithBooks.books" class="book-item" (contextmenu)="onBookRightClick($event, book)">
             <div class="book-info" (click)="onViewBook(book)">
               <span class="book-title">{{ book.title }}</span>
               <span class="book-author">by {{ book.author }}</span>              
@@ -136,6 +136,21 @@
           Create
         </button>
       </div>
+    </div>
+  </div>
+
+  <!-- Context Menu -->
+  <div 
+    class="context-menu" 
+    *ngIf="contextMenuVisible"
+    [style.left.px]="contextMenuX"
+    [style.top.px]="contextMenuY"
+    (click)="$event.stopPropagation()">
+    <div 
+      class="context-menu-item"
+      *ngIf="selectedBookForMenu"
+      (click)="findOnWoB(selectedBookForMenu)">
+      <div class="context-menu-label">Find on WoB</div>
     </div>
   </div>
 </div>

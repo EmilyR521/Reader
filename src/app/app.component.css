@@ -41,7 +41,7 @@ header {
   justify-content: space-between;
   gap: 20px;
   margin-bottom: 30px;
-  padding: 15px 0;
+  padding: 15px 15px;
   border-bottom: 2px solid var(--border-color);
 }
 
@@ -62,7 +62,7 @@ header {
     padding: 10px 0;
     flex-direction: column;
     align-items: stretch;
-  }
+}
 }
 
 

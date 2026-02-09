@@ -139,5 +139,11 @@
     <div class="context-menu-item context-menu-item-disabled" *ngIf="getAvailableCollections().length === 0">
       <div class="context-menu-label">No available collections</div>
     </div>
+    <div 
+      class="context-menu-item"
+      *ngIf="selectedBook"
+      (click)="findOnWoB(selectedBook)">
+      <div class="context-menu-label">Find on WoB</div>
+    </div>
   </div>
 </div>
