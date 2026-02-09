@@ -10,7 +10,9 @@ const DEFAULT_USER = 'Test';
 
 // Middleware
 app.use(cors());
-app.use(express.json());
+// Increase JSON body size limit to 50MB for large imports
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 // Get user-specific data file path
 function getUserDataFile(user) {
