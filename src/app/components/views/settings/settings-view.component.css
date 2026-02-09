@@ -1,0 +1,177 @@
+/* Component-specific styles only */
+
+.settings-view-container {
+  padding: 20px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.settings-header {
+  margin-bottom: 30px;
+}
+
+.settings-header h2 {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 2rem;
+  font-weight: 600;
+}
+
+.settings-content {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.settings-section {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 20px;
+}
+
+.settings-section h3 {
+  margin: 0 0 20px 0;
+  color: var(--text-primary);
+  font-size: 1.3rem;
+  font-weight: 600;
+  border-bottom: 2px solid var(--border-color);
+  padding-bottom: 10px;
+}
+
+.theme-select-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.theme-select-label {
+  color: var(--text-primary);
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.theme-select {
+  width: 100%;
+  padding: 12px 16px;
+  background: var(--input-bg);
+  color: var(--text-primary);
+  border: 1px solid var(--input-border);
+  border-radius: 8px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+
+.theme-select:hover {
+  background: var(--form-bg);
+  border-color: var(--accent-color);
+}
+
+.theme-select:focus {
+  outline: none;
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 3px var(--focus-shadow);
+}
+
+.user-select-wrapper {
+  margin-bottom: 0;
+}
+
+.lookup-options {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 15px;
+}
+
+.lookup-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.lookup-btn {
+  padding: 10px 20px;
+  background: var(--accent-color);
+  color: var(--btn-text);
+  border: 1px solid var(--accent-color);
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  font-family: inherit;
+}
+
+.lookup-btn:hover:not(:disabled) {
+  background: var(--btn-hover);
+  transform: translateY(-2px);
+}
+
+.lookup-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.install-btn {
+  background: var(--accent-color);
+  color: var(--btn-text);
+  border-color: var(--accent-color);
+  font-weight: 600;
+}
+
+.install-btn:hover {
+  background: var(--btn-hover);
+  transform: translateX(4px);
+}
+
+.pwa-installed-message {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: var(--card-bg);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 0.95rem;
+}
+
+.pwa-installed-message .settings-icon {
+  color: #6b8e23;
+  font-weight: bold;
+}
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+  .settings-view-container {
+    padding: 15px;
+  }
+
+  .settings-header h2 {
+    font-size: 1.5rem;
+  }
+
+  .settings-section {
+    padding: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .settings-view-container {
+    padding: 10px;
+  }
+
+  .settings-header h2 {
+    font-size: 1.3rem;
+  }
+
+  .settings-section {
+    padding: 12px;
+  }
+}

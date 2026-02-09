@@ -114,6 +114,26 @@ input[type="checkbox"] {
   accent-color: var(--accent-color);
 }
 
+/* Form Input Class (for styled form inputs) */
+.form-input {
+  width: 100%;
+  padding: 10px 12px;
+  background: var(--input-bg);
+  color: var(--text-primary);
+  border: 2px solid var(--border-color);
+  border-radius: 6px;
+  font-size: 1rem;
+  font-family: inherit;
+  box-sizing: border-box;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 3px var(--focus-shadow);
+}
+
 /* Form Layout Classes (for specific layout needs) */
 .form-row {
   display: flex;

@@ -1,9 +1,11 @@
-import { Component, OnInit, OnDestroy, Output, EventEmitter, ViewChild } from '@angular/core';
+import { Component, OnInit, OnDestroy, Output, EventEmitter, ViewChild, HostListener } from '@angular/core';
 import { ReadingListService } from '../../../services/reading-list.service';
+import { CollectionService } from '../../../services/collection.service';
 import { Book } from '../../../models/book.model';
 import { BookStatus } from '../../../models/book-status.model';
 import { BookRating } from '../../../models/book-rating.model';
-import { Subscription } from 'rxjs';
+import { Collection } from '../../../models/collection.model';
+import { Subscription, combineLatest } from 'rxjs';
 import { FilterControlsComponent, ActiveFilter } from '../../filter-controls/filter-controls.component';
 
 type SortField = 'title' | 'author' | 'status' | 'addedDate' | 'readingStartDate' | 'readingEndDate' | 'rating';
@@ -31,20 +33,68 @@ export class TableViewComponent implements OnInit, OnDestroy {
   BookStatus = BookStatus;
   BookRating = BookRating;
   
+  // Context menu state
+  contextMenuVisible = false;
+  contextMenuX = 0;
+  contextMenuY = 0;
+  selectedBook: Book | null = null;
+  collections: Collection[] = [];
+  submenuOnLeft = false;
+  submenuVisible = false;
+  
+  // Footer collection menu state
+  showFooterCollectionMenu = false;
+  isAddingToCollection = false;
+  
   private booksSubscription?: Subscription;
+  private collectionsSubscription?: Subscription;
 
-  constructor(private readingListService: ReadingListService) {}
+  constructor(
+    private readingListService: ReadingListService,
+    private collectionService: CollectionService
+  ) {}
 
   ngOnInit(): void {
     this.booksSubscription = this.readingListService.books$.subscribe(books => {
       this.books = books;
       this.applyFiltersAndSort();
     });
+
+    // Load collections for context menu
+    this.collectionsSubscription = this.collectionService.collections$.subscribe(collections => {
+      this.collections = collections;
+    });
   }
 
   ngOnDestroy(): void {
     if (this.booksSubscription) {
       this.booksSubscription.unsubscribe();
+    }
+    if (this.collectionsSubscription) {
+      this.collectionsSubscription.unsubscribe();
+    }
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    // Close context menu when clicking outside
+    if (this.contextMenuVisible) {
+      this.closeContextMenu();
+    }
+    // Close footer collection menu when clicking outside
+    if (this.showFooterCollectionMenu) {
+      const target = event.target as HTMLElement;
+      if (!target.closest('.footer-collection-menu-wrapper')) {
+        this.closeFooterCollectionMenu();
+      }
+    }
+  }
+
+  @HostListener('document:contextmenu', ['$event'])
+  onDocumentRightClick(event: MouseEvent): void {
+    // Close context menu when right-clicking elsewhere
+    if (this.contextMenuVisible) {
+      this.closeContextMenu();
     }
   }
 
@@ -299,6 +349,152 @@ export class TableViewComponent implements OnInit, OnDestroy {
       default:
         return '';
     }
+  }
+
+  onRowRightClick(event: MouseEvent, book: Book): void {
+    event.preventDefault();
+    event.stopPropagation();
+    
+    this.selectedBook = book;
+    
+    // Position context menu, ensuring it stays within viewport
+    const menuWidth = 200;
+    const menuHeight = 200; // Approximate
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+    
+    // Adjust X position if menu would go off right edge
+    let x = event.clientX;
+    if (x + menuWidth > viewportWidth) {
+      x = viewportWidth - menuWidth - 10;
+    }
+    
+    // Adjust Y position if menu would go off bottom edge
+    let y = event.clientY;
+    if (y + menuHeight > viewportHeight) {
+      y = viewportHeight - menuHeight - 10;
+    }
+    
+    this.contextMenuX = x;
+    this.contextMenuY = y;
+    // Determine if submenu should appear on left side (if menu is on right side of screen)
+    this.submenuOnLeft = x > window.innerWidth / 2;
+    this.contextMenuVisible = true;
+  }
+
+  closeContextMenu(): void {
+    this.contextMenuVisible = false;
+    this.selectedBook = null;
+    this.submenuVisible = false;
+  }
+
+  addToCollection(collectionId: string): void {
+    if (!this.selectedBook) {
+      return;
+    }
+
+    this.collectionService.addBookToCollection(collectionId, this.selectedBook.id)
+      .subscribe({
+        next: () => {
+          this.closeContextMenu();
+        },
+        error: (error) => {
+          console.error('Error adding book to collection:', error);
+          alert('Failed to add book to collection. Please try again.');
+        }
+      });
+  }
+
+  getAvailableCollections(): Collection[] {
+    if (!this.selectedBook) {
+      return this.collections;
+    }
+    // Filter out collections that already contain this book
+    return this.collections.filter(collection => !collection.bookIds.includes(this.selectedBook!.id));
+  }
+
+  toggleFooterCollectionMenu(): void {
+    this.showFooterCollectionMenu = !this.showFooterCollectionMenu;
+  }
+
+  closeFooterCollectionMenu(): void {
+    this.showFooterCollectionMenu = false;
+  }
+
+  addAllFilteredBooksToCollection(collectionId: string): void {
+    if (this.sortedBooks.length === 0 || this.isAddingToCollection) {
+      return;
+    }
+
+    this.isAddingToCollection = true;
+    const collection = this.collections.find(c => c.id === collectionId);
+    
+    if (!collection) {
+      this.isAddingToCollection = false;
+      return;
+    }
+
+    // Get books that aren't already in the collection
+    const booksToAdd = this.sortedBooks.filter(book => !collection.bookIds.includes(book.id));
+    
+    if (booksToAdd.length === 0) {
+      alert('All filtered books are already in this collection.');
+      this.isAddingToCollection = false;
+      this.closeFooterCollectionMenu();
+      return;
+    }
+
+    // Add books sequentially to avoid race conditions
+    let completed = 0;
+    let failed = 0;
+    const total = booksToAdd.length;
+    let currentIndex = 0;
+
+    const addNextBook = () => {
+      if (currentIndex >= booksToAdd.length) {
+        // All books processed
+        this.isAddingToCollection = false;
+        this.closeFooterCollectionMenu();
+        if (failed === 0) {
+          alert(`Successfully added ${completed} book${completed === 1 ? '' : 's'} to "${collection.name}"!`);
+        } else {
+          alert(`Added ${completed} book${completed === 1 ? '' : 's'} to "${collection.name}". ${failed} failed.`);
+        }
+        return;
+      }
+
+      const book = booksToAdd[currentIndex];
+      currentIndex++;
+
+      this.collectionService.addBookToCollection(collectionId, book.id)
+        .subscribe({
+          next: () => {
+            completed++;
+            // Continue with next book
+            addNextBook();
+          },
+          error: (error) => {
+            console.error(`Error adding book "${book.title}" to collection:`, error);
+            failed++;
+            // Continue with next book even if this one failed
+            addNextBook();
+          }
+        });
+    };
+
+    // Start adding books
+    addNextBook();
+  }
+
+  getFooterAvailableCollections(): Collection[] {
+    // Return all collections - user can add books even if some are already in the collection
+    // (the service will handle duplicates)
+    return this.collections;
+  }
+
+  hasActiveFilters(): boolean {
+    return this.activeFilters.length > 0 || this.selectedYear !== null || 
+           this.dateRangeStart !== null || this.dateRangeEnd !== null;
   }
 
 }

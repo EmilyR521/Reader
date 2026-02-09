@@ -6,9 +6,12 @@ import { Theme } from '../models/theme.model';
 })
 export class ThemeService {
   private readonly STORAGE_KEY = 'theme';
-  private currentTheme: Theme = 'bookish-light';
+  private readonly DEFAULT_THEME: Theme = 'minimal-light';
+  private currentTheme: Theme = this.DEFAULT_THEME;
 
   constructor() {
+    // Load and apply theme immediately on service instantiation
+    // This ensures theme is applied before Angular renders components
     this.loadTheme();
   }
 
@@ -47,13 +50,13 @@ export class ThemeService {
         stored === 'minimal-light' || stored === 'minimal-dark') {
       this.currentTheme = stored as Theme;
     } else if (stored === 'light' || stored === 'dark') {
-      // Migrate old theme names
-      this.currentTheme = stored === 'dark' ? 'bookish-dark' : 'bookish-light';
+      // Migrate old theme names to minimal theme
+      this.currentTheme = stored === 'dark' ? 'minimal-dark' : 'minimal-light';
+      this.saveTheme(); // Save migrated theme
     } else {
-      // Check system preference
-      if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-        this.currentTheme = 'bookish-dark';
-      }
+      // No stored theme - use default
+      this.currentTheme = this.DEFAULT_THEME;
+      this.saveTheme(); // Save default theme
     }
     this.applyTheme();
   }

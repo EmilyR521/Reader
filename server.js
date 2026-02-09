@@ -34,7 +34,8 @@ async function ensureDataDirectory() {
           username: DEFAULT_USER,
           icon: '📚'
         },
-        books: []
+        books: [],
+        collections: []
       };
       await fs.writeFile(defaultFile, JSON.stringify(newData, null, 2), 'utf8');
     }
@@ -62,6 +63,10 @@ async function readUserData(user) {
       parsed.books = [];
     }
     
+    if (!parsed.collections) {
+      parsed.collections = [];
+    }
+    
     return parsed;
   } catch (error) {
     // If file doesn't exist, return default structure
@@ -71,7 +76,8 @@ async function readUserData(user) {
           username: user,
           icon: '📚'
         },
-        books: []
+        books: [],
+        collections: []
       };
     }
     console.error('Error reading user data:', error);
@@ -80,7 +86,8 @@ async function readUserData(user) {
         username: user,
         icon: '📚'
       },
-      books: []
+      books: [],
+      collections: []
     };
   }
 }
@@ -132,6 +139,32 @@ async function updateUserMetadata(user, metadata) {
     return true;
   } catch (error) {
     console.error('Error updating user metadata:', error);
+    return false;
+  }
+}
+
+// Read collections from file for a specific user (returns just the collections array)
+async function readCollections(user) {
+  const userData = await readUserData(user);
+  return userData.collections || [];
+}
+
+// Write collections to file for a specific user
+async function writeCollections(user, collections) {
+  try {
+    const dataFile = getUserDataFile(user);
+    await fs.mkdir(DATA_DIR, { recursive: true });
+    
+    // Read existing data to preserve metadata and books
+    const existingData = await readUserData(user);
+    
+    // Update collections
+    existingData.collections = collections;
+    
+    await fs.writeFile(dataFile, JSON.stringify(existingData, null, 2), 'utf8');
+    return true;
+  } catch (error) {
+    console.error('Error writing collections:', error);
     return false;
   }
 }
@@ -230,7 +263,8 @@ app.post('/api/books', async (req, res) => {
       readingEndDate, 
       notes, 
       tags,
-      imageUrl
+      imageUrl,
+      owned
     } = req.body;
     
     if (!title || !author) {
@@ -240,6 +274,10 @@ app.post('/api/books', async (req, res) => {
     // Validate status
     const validStatuses = ['to read', 'reading', 'finished', 'on hold', 'abandoned'];
     const bookStatus = status && validStatuses.includes(status) ? status : 'to read';
+
+    // Validate owned
+    const validOwned = ['not owned', 'physical', 'digital', 'loaned'];
+    const bookOwned = owned && validOwned.includes(owned) ? owned : null;
 
     const books = await readBooks(user);
     const newBook = {
@@ -253,7 +291,8 @@ app.post('/api/books', async (req, res) => {
       readingEndDate: readingEndDate || null,
       notes: notes ? notes.trim() : null,
       tags: Array.isArray(tags) ? tags.map(t => t.trim()).filter(t => t) : [],
-      imageUrl: imageUrl || null
+      imageUrl: imageUrl || null,
+      owned: bookOwned
     };
 
     books.push(newBook);
@@ -321,6 +360,177 @@ app.delete('/api/books/:id', async (req, res) => {
   } catch (error) {
     console.error('Error deleting book:', error);
     res.status(500).json({ error: 'Failed to delete book' });
+  }
+});
+
+// GET /api/collections - Get all collections for a user
+app.get('/api/collections', async (req, res) => {
+  try {
+    const user = req.query.user || DEFAULT_USER;
+    const collections = await readCollections(user);
+    res.json(collections);
+  } catch (error) {
+    console.error('Error getting collections:', error);
+    res.status(500).json({ error: 'Failed to retrieve collections' });
+  }
+});
+
+// POST /api/collections - Create a new collection
+app.post('/api/collections', async (req, res) => {
+  try {
+    const user = req.query.user || req.body.user || DEFAULT_USER;
+    const { name } = req.body;
+    
+    if (!name || !name.trim()) {
+      return res.status(400).json({ error: 'Collection name is required' });
+    }
+
+    const collections = await readCollections(user);
+    const newCollection = {
+      id: Date.now().toString(36) + Math.random().toString(36).substr(2),
+      name: name.trim(),
+      bookIds: [],
+      createdDate: new Date().toISOString()
+    };
+
+    collections.push(newCollection);
+    const success = await writeCollections(user, collections);
+    
+    if (success) {
+      res.status(201).json(newCollection);
+    } else {
+      res.status(500).json({ error: 'Failed to save collection' });
+    }
+  } catch (error) {
+    console.error('Error creating collection:', error);
+    res.status(500).json({ error: 'Failed to create collection' });
+  }
+});
+
+// PUT /api/collections/:id - Update a collection
+app.put('/api/collections/:id', async (req, res) => {
+  try {
+    const user = req.query.user || req.body.user || DEFAULT_USER;
+    const { id } = req.params;
+    const updates = req.body;
+
+    const collections = await readCollections(user);
+    const index = collections.findIndex(collection => collection.id === id);
+
+    if (index === -1) {
+      return res.status(404).json({ error: 'Collection not found' });
+    }
+
+    // Only allow updating name, preserve bookIds and createdDate
+    if (updates.name) {
+      collections[index].name = updates.name.trim();
+    }
+
+    const success = await writeCollections(user, collections);
+
+    if (success) {
+      res.json(collections[index]);
+    } else {
+      res.status(500).json({ error: 'Failed to update collection' });
+    }
+  } catch (error) {
+    console.error('Error updating collection:', error);
+    res.status(500).json({ error: 'Failed to update collection' });
+  }
+});
+
+// DELETE /api/collections/:id - Delete a collection
+app.delete('/api/collections/:id', async (req, res) => {
+  try {
+    const user = req.query.user || DEFAULT_USER;
+    const { id } = req.params;
+
+    const collections = await readCollections(user);
+    const filteredCollections = collections.filter(collection => collection.id !== id);
+
+    if (collections.length === filteredCollections.length) {
+      return res.status(404).json({ error: 'Collection not found' });
+    }
+
+    const success = await writeCollections(user, filteredCollections);
+
+    if (success) {
+      res.status(204).send();
+    } else {
+      res.status(500).json({ error: 'Failed to delete collection' });
+    }
+  } catch (error) {
+    console.error('Error deleting collection:', error);
+    res.status(500).json({ error: 'Failed to delete collection' });
+  }
+});
+
+// POST /api/collections/:id/books - Add a book to a collection
+app.post('/api/collections/:id/books', async (req, res) => {
+  try {
+    const user = req.query.user || req.body.user || DEFAULT_USER;
+    const { id } = req.params;
+    const { bookId } = req.body;
+
+    if (!bookId) {
+      return res.status(400).json({ error: 'Book ID is required' });
+    }
+
+    const collections = await readCollections(user);
+    const collection = collections.find(c => c.id === id);
+
+    if (!collection) {
+      return res.status(404).json({ error: 'Collection not found' });
+    }
+
+    // Check if book already in collection
+    if (collection.bookIds.includes(bookId)) {
+      return res.status(400).json({ error: 'Book already in collection' });
+    }
+
+    collection.bookIds.push(bookId);
+    const success = await writeCollections(user, collections);
+
+    if (success) {
+      res.json(collection);
+    } else {
+      res.status(500).json({ error: 'Failed to add book to collection' });
+    }
+  } catch (error) {
+    console.error('Error adding book to collection:', error);
+    res.status(500).json({ error: 'Failed to add book to collection' });
+  }
+});
+
+// DELETE /api/collections/:id/books/:bookId - Remove a book from a collection
+app.delete('/api/collections/:id/books/:bookId', async (req, res) => {
+  try {
+    const user = req.query.user || DEFAULT_USER;
+    const { id, bookId } = req.params;
+
+    const collections = await readCollections(user);
+    const collection = collections.find(c => c.id === id);
+
+    if (!collection) {
+      return res.status(404).json({ error: 'Collection not found' });
+    }
+
+    const index = collection.bookIds.indexOf(bookId);
+    if (index === -1) {
+      return res.status(404).json({ error: 'Book not found in collection' });
+    }
+
+    collection.bookIds.splice(index, 1);
+    const success = await writeCollections(user, collections);
+
+    if (success) {
+      res.json(collection);
+    } else {
+      res.status(500).json({ error: 'Failed to remove book from collection' });
+    }
+  } catch (error) {
+    console.error('Error removing book from collection:', error);
+    res.status(500).json({ error: 'Failed to remove book from collection' });
   }
 });
 

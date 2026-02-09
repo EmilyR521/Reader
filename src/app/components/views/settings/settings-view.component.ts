@@ -1,18 +1,16 @@
-import { Component, EventEmitter, OnInit, OnDestroy, Output } from '@angular/core';
-import { ThemeService } from '../../services/theme.service';
-import { CoverLookupService } from '../../services/cover-lookup.service';
-import { ReadingListService } from '../../services/reading-list.service';
-import { UserService, User } from '../../services/user.service';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { ThemeService } from '../../../services/theme.service';
+import { CoverLookupService } from '../../../services/cover-lookup.service';
+import { ReadingListService } from '../../../services/reading-list.service';
+import { UserService, User } from '../../../services/user.service';
 import { Subscription, combineLatest } from 'rxjs';
 
 @Component({
-  selector: 'app-settings-drawer',
-  templateUrl: './settings-drawer.component.html',
-  styleUrls: ['./settings-drawer.component.css']
+  selector: 'app-settings-view',
+  templateUrl: './settings-view.component.html',
+  styleUrls: ['./settings-view.component.css']
 })
-export class SettingsDrawerComponent implements OnInit, OnDestroy {
-  @Output() drawerClose = new EventEmitter<void>();
-
+export class SettingsViewComponent implements OnInit, OnDestroy {
   isLookingUpData = false;
   isCsvExpanded = false;
   isLookupDataExpanded = false;
@@ -26,6 +24,9 @@ export class SettingsDrawerComponent implements OnInit, OnDestroy {
   selectedIcon: string = '📚';
   showAddUserModal: boolean = false;
   isCreatingUser: boolean = false;
+  deferredPrompt: any = null;
+  isPWAInstalled: boolean = false;
+  showInstallButton: boolean = false;
   availableEmojis: string[] = [
     '📚', '👤', '🌟', '🎯', '🔥', '💫', '⭐', '✨', '🎨', '🎭',
     '🎪', '🎬', '🎮', '🎲', '🎸', '🎺', '🎻', '🎤', '🎧', '🎵',
@@ -60,6 +61,23 @@ export class SettingsDrawerComponent implements OnInit, OnDestroy {
           select.value = currentUser;
         }
       }, 0);
+    });
+
+    // Check if PWA is already installed
+    this.checkPWAInstallation();
+
+    // Listen for the beforeinstallprompt event
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      this.deferredPrompt = e;
+      this.showInstallButton = true;
+    });
+
+    // Listen for app installed event
+    window.addEventListener('appinstalled', () => {
+      this.isPWAInstalled = true;
+      this.showInstallButton = false;
+      this.deferredPrompt = null;
     });
   }
 
@@ -229,7 +247,45 @@ export class SettingsDrawerComponent implements OnInit, OnDestroy {
     });
   }
 
-  close(): void {
-    this.drawerClose.emit();
+  checkPWAInstallation(): void {
+    // Check if running as standalone (installed PWA)
+    if (window.matchMedia('(display-mode: standalone)').matches) {
+      this.isPWAInstalled = true;
+      this.showInstallButton = false;
+      return;
+    }
+
+    // Check if running on iOS and if it's installed
+    if ((window.navigator as any).standalone === true) {
+      this.isPWAInstalled = true;
+      this.showInstallButton = false;
+      return;
+    }
+
+    // For other platforms, check if deferredPrompt is available
+    this.showInstallButton = this.deferredPrompt !== null;
+  }
+
+  async installPWA(): Promise<void> {
+    if (!this.deferredPrompt) {
+      return;
+    }
+
+    // Show the install prompt
+    this.deferredPrompt.prompt();
+
+    // Wait for the user to respond to the prompt
+    const { outcome } = await this.deferredPrompt.userChoice;
+
+    if (outcome === 'accepted') {
+      console.log('User accepted the install prompt');
+      this.isPWAInstalled = true;
+    } else {
+      console.log('User dismissed the install prompt');
+    }
+
+    // Clear the deferredPrompt
+    this.deferredPrompt = null;
+    this.showInstallButton = false;
   }
 }

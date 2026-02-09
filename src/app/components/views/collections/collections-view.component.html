@@ -1,0 +1,141 @@
+<div class="collections-container">
+  <div class="collections-header">
+    <h2>Reading Collections</h2>
+    <button class="btn btn-primary" (click)="openCreateModal()">
+      + New Collection
+    </button>
+  </div>
+
+  <div class="collections-list" *ngIf="collectionsWithBooks.length > 0; else emptyState">
+    <div *ngFor="let collectionWithBooks of collectionsWithBooks" class="collection-card card-base">
+      <div class="collection-header">
+        <div class="collection-title-section">
+          <div *ngIf="editingCollectionId !== collectionWithBooks.id" class="collection-title-display">
+            <h3>{{ collectionWithBooks.name }}</h3>
+            <span class="collection-count">({{ collectionWithBooks.books.length }} {{ collectionWithBooks.books.length === 1 ? 'book' : 'books' }})</span>
+          </div>
+          <div *ngIf="editingCollectionId === collectionWithBooks.id" class="collection-title-edit">
+            <input 
+              type="text" 
+              [(ngModel)]="editingCollectionName" 
+              class="collection-name-input"
+              (keyup.enter)="saveCollection(collectionWithBooks.id)"
+              (keyup.escape)="cancelEditing()"
+              #nameInput>
+            <div class="edit-actions">
+              <button class="btn-save" (click)="saveCollection(collectionWithBooks.id)" title="Save">
+                <span>✓</span>
+              </button>
+              <button class="btn-cancel" (click)="cancelEditing()" title="Cancel">
+                <span>✕</span>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div *ngIf="editingCollectionId !== collectionWithBooks.id" class="collection-actions">
+          <button class="btn-icon" (click)="startEditing(collectionWithBooks)" title="Edit collection name">
+            <span>✏️</span>
+          </button>
+          <button class="btn-icon btn-danger" (click)="deleteCollection(collectionWithBooks.id)" title="Delete collection">
+            <span>🗑️</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="collection-books">
+        <div *ngIf="collectionWithBooks.books.length > 0" class="books-list">
+          <div *ngFor="let book of collectionWithBooks.books" class="book-item">
+            <div class="book-info" (click)="onViewBook(book)">
+              <span class="book-title">{{ book.title }}</span>
+              <span class="book-author">by {{ book.author }}</span>              
+            </div>
+            <div class="book-status"><span class="status-badge" [class]="'status-' + book.status">
+              {{ book.status }}
+            </span></div>
+            <button 
+              class="btn-remove" 
+              (click)="removeBookFromCollection(collectionWithBooks.id, book.id)"
+              title="Remove from collection">
+              <span>✕</span>
+            </button>
+          </div>
+        </div>
+        <div *ngIf="collectionWithBooks.books.length === 0" class="empty-collection">
+          <p>No books in this collection yet.</p>
+        </div>
+      </div>
+
+      <div class="add-book-section">
+        <div class="book-search-wrapper" *ngIf="getAvailableBooks(collectionWithBooks).length > 0">
+          <input
+            type="text"
+            class="book-search-input"
+            [placeholder]="'Search books by title or author...'"
+            [value]="bookSearchTerms[collectionWithBooks.id] || ''"
+            (input)="onBookSearchInput(collectionWithBooks.id, $any($event.target).value)"
+            (focus)="onBookSearchFocus(collectionWithBooks.id)"
+            (blur)="onBookSearchBlur(collectionWithBooks.id)"
+            (keydown.escape)="clearBookSearch(collectionWithBooks.id)"
+            [disabled]="getAvailableBooks(collectionWithBooks).length === 0">
+          <button
+            *ngIf="bookSearchTerms[collectionWithBooks.id]"
+            class="book-search-clear"
+            (click)="clearBookSearch(collectionWithBooks.id)"
+            type="button"
+            title="Clear search">
+            ✕
+          </button>
+          <div class="book-search-dropdown" *ngIf="showBookDropdown[collectionWithBooks.id] && getFilteredBooks(collectionWithBooks).length > 0">
+            <div
+              *ngFor="let book of getFilteredBooks(collectionWithBooks)"
+              class="book-search-item"
+              (mousedown)="selectBook(collectionWithBooks.id, book.id)"
+              [title]="book.title + ' by ' + book.author">
+              <span class="book-search-title">{{ book.title }}</span>
+              <span class="book-search-author">by {{ book.author }}</span>
+            </div>
+          </div>
+          <div class="book-search-dropdown empty" *ngIf="showBookDropdown[collectionWithBooks.id] && getFilteredBooks(collectionWithBooks).length === 0 && (bookSearchTerms[collectionWithBooks.id] || '').trim().length > 0">
+            <div class="book-search-item disabled">No books found</div>
+          </div>
+        </div>
+        <div *ngIf="getAvailableBooks(collectionWithBooks).length === 0" class="no-books-message">
+          <span class="no-books-text">All books are already in this collection</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <ng-template #emptyState>
+    <div class="empty-state">
+      <p>You don't have any collections yet. Create one to organize your reading!</p>
+    </div>
+  </ng-template>
+
+  <!-- Create Collection Modal -->
+  <div class="modal-overlay" *ngIf="showCreateModal" (click)="closeCreateModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Create New Collection</h3>
+        <button class="btn-close" (click)="closeCreateModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <label for="collection-name">Collection Name</label>
+        <input 
+          type="text" 
+          id="collection-name"
+          [(ngModel)]="newCollectionName" 
+          class="form-input"
+          placeholder="Enter collection name..."
+          (keyup.enter)="createCollection()"
+          #nameInput>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" (click)="closeCreateModal()">Cancel</button>
+        <button class="btn-primary" (click)="createCollection()" [disabled]="!newCollectionName.trim()">
+          Create
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

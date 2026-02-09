@@ -1,15 +1,18 @@
-import { Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, OnDestroy, OnChanges, SimpleChanges, HostListener } from '@angular/core';
 import { ReadingListService } from '../../services/reading-list.service';
+import { CollectionService } from '../../services/collection.service';
 import { Book } from '../../models/book.model';
 import { BookStatus } from '../../models/book-status.model';
 import { BookRating } from '../../models/book-rating.model';
+import { Collection } from '../../models/collection.model';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-book-details',
   templateUrl: './book-details.component.html',
   styleUrls: ['./book-details.component.css']
 })
-export class BookDetailsComponent implements OnInit, OnChanges {
+export class BookDetailsComponent implements OnInit, OnDestroy, OnChanges {
   @Input() book: Book | null = null;
   @Input() isOpen: boolean = false;
   @Output() closed = new EventEmitter<void>();
@@ -20,13 +23,39 @@ export class BookDetailsComponent implements OnInit, OnChanges {
   isEditMode = false;
   imageError = false;
   BookRating = BookRating;
+  
+  // Collection functionality
+  collections: Collection[] = [];
+  showCollectionMenu = false;
+  private collectionsSubscription?: Subscription;
 
   constructor(
-    private readingListService: ReadingListService
+    private readingListService: ReadingListService,
+    private collectionService: CollectionService
   ) { }
 
   ngOnInit(): void {
-    // Component initialized
+    // Load collections for "Add to collection" functionality
+    this.collectionsSubscription = this.collectionService.collections$.subscribe(collections => {
+      this.collections = collections;
+    });
+  }
+
+  ngOnDestroy(): void {
+    if (this.collectionsSubscription) {
+      this.collectionsSubscription.unsubscribe();
+    }
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    // Close collection menu when clicking outside
+    if (this.showCollectionMenu) {
+      const target = event.target as HTMLElement;
+      if (!target.closest('.collection-menu-wrapper')) {
+        this.closeCollectionMenu();
+      }
+    }
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -34,13 +63,16 @@ export class BookDetailsComponent implements OnInit, OnChanges {
       if (this.isOpen && this.book) {
         this.isEditMode = false; // Start in view mode
         this.imageError = false; // Reset image error when book changes
+        this.showCollectionMenu = false; // Close collection menu when book changes
       } else if (this.isOpen && !this.book) {
         // Adding new book
         this.isEditMode = true;
         this.imageError = false;
+        this.showCollectionMenu = false;
       } else if (!this.isOpen) {
         this.isEditMode = false;
         this.imageError = false;
+        this.showCollectionMenu = false; // Close collection menu when drawer closes
       }
     }
   }
@@ -155,5 +187,38 @@ export class BookDetailsComponent implements OnInit, OnChanges {
   onImageError(event: Event): void {
     // Mark image as failed to show placeholder
     this.imageError = true;
+  }
+
+  toggleCollectionMenu(): void {
+    this.showCollectionMenu = !this.showCollectionMenu;
+  }
+
+  closeCollectionMenu(): void {
+    this.showCollectionMenu = false;
+  }
+
+  addToCollection(collectionId: string): void {
+    if (!this.book) {
+      return;
+    }
+
+    this.collectionService.addBookToCollection(collectionId, this.book.id)
+      .subscribe({
+        next: () => {
+          this.closeCollectionMenu();
+        },
+        error: (error) => {
+          console.error('Error adding book to collection:', error);
+          alert('Failed to add book to collection. Please try again.');
+        }
+      });
+  }
+
+  getAvailableCollections(): Collection[] {
+    if (!this.book) {
+      return this.collections;
+    }
+    // Filter out collections that already contain this book
+    return this.collections.filter(collection => !collection.bookIds.includes(this.book!.id));
   }
 }

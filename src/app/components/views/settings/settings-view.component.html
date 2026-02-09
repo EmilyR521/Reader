@@ -1,0 +1,151 @@
+<div class="settings-view-container">
+  <div class="settings-header">
+    <h2>Settings</h2>
+  </div>
+  
+  <div class="settings-content">
+    <div class="settings-section">
+      <h3>Appearance</h3>
+      <div class="theme-select-wrapper">
+        <label for="theme-select" class="theme-select-label">Theme</label>
+        <select 
+          id="theme-select" 
+          class="theme-select"
+          [value]="themeService.getTheme()"
+          (change)="onThemeChange($any($event.target).value)">
+          <option value="bookish-light">Bookish Light</option>
+          <option value="bookish-dark">Bookish Dark</option>
+          <option value="minimal-light">Minimal Light</option>
+          <option value="minimal-dark">Minimal Dark</option>
+        </select>
+      </div>
+    </div>
+    
+    <!-- Add New User Modal -->
+    <div class="modal-overlay" *ngIf="showAddUserModal" (click)="closeAddUserModal()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h2>Add New User</h2>
+          <button class="modal-close" (click)="closeAddUserModal()" aria-label="Close">×</button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="new-user-name-input" class="required">User Name</label>
+            <input 
+              type="text" 
+              id="new-user-name-input"
+              class="user-name-input"
+              [(ngModel)]="newUserName"
+              placeholder="Enter user name"
+              (keyup.enter)="createNewUser()"
+              (keyup.escape)="closeAddUserModal()"
+              #userNameInput>
+          </div>
+          <div class="form-group">
+            <label>Choose an Icon</label>
+            <div class="emoji-grid">
+              <button
+                *ngFor="let emoji of availableEmojis"
+                type="button"
+                class="emoji-btn"
+                [class.selected]="selectedIcon === emoji"
+                (click)="selectIcon(emoji)"
+                [title]="emoji">
+                {{ emoji }}
+              </button>
+            </div>
+          </div>
+          <div class="form-actions">
+            <button 
+              class="btn btn-primary"
+              (click)="createNewUser()"
+              [disabled]="!newUserName || newUserName.trim() === '' || isCreatingUser">
+              {{ isCreatingUser ? 'Creating...' : 'Create' }}
+            </button>
+            <button 
+              class="btn btn-secondary"
+              (click)="closeAddUserModal()"
+              [disabled]="isCreatingUser">
+              Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="settings-section">
+      <h3>Data Management</h3>
+      <button class="settings-btn expander-btn" (click)="toggleCsvSection()" title="CSV Import/Export">
+        <span class="settings-icon">📊</span>
+        <span class="settings-text">CSV Import/Export</span>
+        <span class="expander-icon">{{ isCsvExpanded ? '▼' : '▶' }}</span>
+      </button>
+      <div class="expander-content" *ngIf="isCsvExpanded">
+        <app-csv-import-export></app-csv-import-export>
+      </div>
+      <button class="settings-btn expander-btn" (click)="toggleLookupDataSection()" title="Lookup Data">
+        <span class="settings-icon">🔍</span>
+        <span class="settings-text">Lookup Data</span>
+        <span class="expander-icon">{{ isLookupDataExpanded ? '▼' : '▶' }}</span>
+      </button>
+      <div class="expander-content" *ngIf="isLookupDataExpanded">
+        <div class="lookup-options">
+          <label class="lookup-option">
+            <input 
+              type="checkbox" 
+              [checked]="lookupOptions.covers"
+              (change)="toggleLookupOption('covers')">
+            <span class="lookup-label">Covers</span>
+          </label>
+          <label class="lookup-option">
+            <input 
+              type="checkbox" 
+              [checked]="lookupOptions.publicationDates"
+              (change)="toggleLookupOption('publicationDates')">
+            <span class="lookup-label">Publication dates</span>
+          </label>
+        </div>
+        <button 
+          class="lookup-btn" 
+          (click)="lookupData()" 
+          [disabled]="isLookingUpData || (!lookupOptions.covers && !lookupOptions.publicationDates)">
+          <span *ngIf="!isLookingUpData">🔍 Lookup</span>
+          <span *ngIf="isLookingUpData">⏳ Looking up...</span>
+        </button>
+      </div>
+    </div>
+    
+    <div class="settings-section">
+      <h3>User</h3>
+      <div class="user-select-wrapper">
+        <label for="user-select" class="user-select-label">Switch User</label>
+        <div class="select-wrapper-custom">
+          <select 
+            id="user-select" 
+            class="user-select"
+            [value]="currentUser"
+            (change)="onUserChange($any($event.target).value)">
+            <option *ngFor="let user of availableUsers" [value]="user.username">{{ user.icon }} {{ user.username }}</option>
+            <option value="__add_new__">+ Add new user</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    
+    <div class="settings-section" *ngIf="showInstallButton || isPWAInstalled">
+      <h3>Install App</h3>
+      <button 
+        *ngIf="showInstallButton"
+        class="settings-btn install-btn"
+        (click)="installPWA()"
+        title="Install as Progressive Web App">
+        <span class="settings-icon">📱</span>
+        <span class="settings-text">Install PWA</span>
+      </button>
+      <div *ngIf="isPWAInstalled" class="pwa-installed-message">
+        <span class="settings-icon">✓</span>
+        <span class="settings-text">App is installed</span>
+      </div>
+    </div>
+  </div>
+</div>

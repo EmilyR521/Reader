@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { ReadingListService } from '../../../services/reading-list.service';
-import { CsvImportExportService } from '../../../services/csv-import-export.service';
-import { Book } from '../../../models/book.model';
+import { ReadingListService } from '../../../../services/reading-list.service';
+import { CsvImportExportService } from '../../../../services/csv-import-export.service';
+import { Book } from '../../../../models/book.model';
 
 @Component({
   selector: 'app-csv-import-export',

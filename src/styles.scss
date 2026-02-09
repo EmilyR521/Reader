@@ -1,6 +1,7 @@
 @import 'app/styles/themes';
 @import 'app/styles/forms';
 @import 'app/styles/drawer';
+@import 'app/styles/shared-components';
 
 * {
   margin: 0;
@@ -25,6 +26,25 @@
   transition: all 0.3s ease;
   text-align: center;
   display: inline-block;
+  min-height: 44px; /* Minimum touch target */
+  touch-action: manipulation; /* Prevent double-tap zoom */
+}
+
+@media (max-width: 768px) {
+  .btn {
+    padding: 12px 20px;
+    min-height: 48px;
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .btn {
+    padding: 14px 20px;
+    min-height: 52px;
+    font-size: 1.05rem;
+    width: 100%; /* Full width on very small screens */
+  }
 }
 
 .btn-small {
@@ -413,6 +433,7 @@
 
 .view-toolbar {
   flex: 1;
+  min-width: 0; /* Allow flex item to shrink */
 }
 
 .view-buttons {
@@ -437,6 +458,34 @@
   font-weight: 500;
   transition: all 0.3s ease;
   box-shadow: 0 2px 4px rgba(44, 24, 16, 0.1);
+  min-height: 44px; /* Minimum touch target */
+  touch-action: manipulation; /* Prevent double-tap zoom */
+  white-space: nowrap; /* Prevent text wrapping */
+}
+
+@media (max-width: 768px) {
+  .view-btn {
+    padding: 12px 16px;
+    min-height: 48px;
+    font-size: 0.9rem;
+    gap: 6px;
+  }
+}
+
+@media (max-width: 480px) {
+  .view-buttons {
+    gap: 8px;
+    width: 100%;
+  }
+
+  .view-btn {
+    flex: 1;
+    min-width: 0;
+    padding: 14px 12px;
+    min-height: 52px;
+    justify-content: center;
+    gap: 6px;
+  }
 }
 
 .minimal-light .view-btn,
@@ -465,11 +514,30 @@
 
 .view-icon {
   font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+  .view-icon {
+    font-size: 1.3rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .view-icon {
+    font-size: 1.4rem;
+  }
 }
 
 .view-label {
   font-size: 0.9rem;
   letter-spacing: 0.3px;
+}
+
+@media (max-width: 480px) {
+  .view-label {
+    font-size: 0.85rem;
+  }
 }
 
 .image-preview {

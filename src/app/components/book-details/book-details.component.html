@@ -65,6 +65,25 @@
 
       <div class="book-view-actions">
         <button class="btn btn-primary" (click)="toggleEditMode()">Edit</button>
+        <div class="collection-menu-wrapper" *ngIf="getAvailableCollections().length > 0">
+          <button 
+            class="btn btn-secondary" 
+            (click)="toggleCollectionMenu()"
+            [class.active]="showCollectionMenu">
+            Add to Collection
+          </button>
+          <div class="collection-dropdown" *ngIf="showCollectionMenu">
+            <div 
+              *ngFor="let collection of getAvailableCollections()"
+              class="collection-dropdown-item"
+              (click)="addToCollection(collection.id)">
+              {{ collection.name }}
+            </div>
+          </div>
+        </div>
+        <div *ngIf="getAvailableCollections().length === 0" class="no-collections-message">
+          <span class="no-collections-text">No available collections</span>
+        </div>
         <button class="btn btn-danger" (click)="deleteBook()" [disabled]="isLoading">
           {{ isLoading ? 'Deleting...' : 'Delete' }}
         </button>

@@ -2,10 +2,6 @@
 
 @media (max-width: 600px) {
   .view-label {
-    display: none;
-  }
-
-  .view-btn {
-    padding: 10px 15px;
+    display: inline; /* Keep labels visible on mobile for better UX */
   }
 }

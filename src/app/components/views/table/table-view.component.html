@@ -31,7 +31,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let book of sortedBooks" [class]="'status-' + book.status">
+        <tr *ngFor="let book of sortedBooks" [class]="'status-' + book.status" (contextmenu)="onRowRightClick($event, book)">
           <td class="title-cell clickable-title" (click)="onViewBook(book)">{{ book.title }}</td>
           <td class="clickable-author" (click)="filterControls.filterByAuthor(book.author, $event)" [title]="'Click to filter by ' + book.author">{{ book.author }}</td>
           <td class="clickable-status" (click)="filterControls.filterByStatus(book.status, $event)" [title]="'Click to filter by ' + book.status">
@@ -71,13 +71,73 @@
       <tfoot>
         <tr class="table-footer">
           <td colspan="7">
-            <span class="row-count">{{ sortedBooks.length }} {{ sortedBooks.length === 1 ? 'book' : 'books' }}</span>
-            <span *ngIf="activeFilters.length > 0" class="filter-indicator">
-              (filtered from {{ books.length }} total)
-            </span>
+            <div class="footer-content">
+              <div class="footer-left">
+                <span class="row-count">{{ sortedBooks.length }} {{ sortedBooks.length === 1 ? 'book' : 'books' }}</span>
+                <span *ngIf="hasActiveFilters()" class="filter-indicator">
+                  (filtered from {{ books.length }} total)
+                </span>
+              </div>
+              <div class="footer-right" *ngIf="hasActiveFilters() && sortedBooks.length > 0">
+                <div class="footer-collection-menu-wrapper">
+                  <button 
+                    class="btn btn-primary btn-small footer-add-collection-btn"
+                    (click)="toggleFooterCollectionMenu()"
+                    [class.active]="showFooterCollectionMenu"
+                    [disabled]="isAddingToCollection">
+                    <span *ngIf="!isAddingToCollection">+ Add {{ sortedBooks.length }} {{ sortedBooks.length === 1 ? 'Book' : 'Books' }} to Collection</span>
+                    <span *ngIf="isAddingToCollection">Adding...</span>
+                  </button>
+                  <div class="footer-collection-dropdown" *ngIf="showFooterCollectionMenu && getFooterAvailableCollections().length > 0">
+                    <div 
+                      *ngFor="let collection of getFooterAvailableCollections()"
+                      class="footer-collection-dropdown-item"
+                      (click)="addAllFilteredBooksToCollection(collection.id)">
+                      {{ collection.name }}
+                    </div>
+                  </div>
+                  <div *ngIf="showFooterCollectionMenu && getFooterAvailableCollections().length === 0" class="footer-collection-dropdown empty">
+                    <div class="footer-collection-dropdown-item disabled">No collections available</div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </td>
         </tr>
       </tfoot>
     </table>
+  </div>
+
+  <!-- Context Menu -->
+  <div 
+    class="context-menu" 
+    *ngIf="contextMenuVisible"
+    [style.left.px]="contextMenuX"
+    [style.top.px]="contextMenuY"
+    (click)="$event.stopPropagation()">
+    <div 
+      class="context-menu-item" 
+      [class.submenu-left-item]="submenuOnLeft"
+      *ngIf="getAvailableCollections().length > 0"
+      (mouseenter)="submenuVisible = true"
+      (mouseleave)="submenuVisible = false">
+      <div class="context-menu-label">Add to collection</div>
+      <div 
+        class="context-menu-submenu" 
+        [class.submenu-left]="submenuOnLeft"
+        [class.submenu-visible]="submenuVisible"
+        (mouseenter)="submenuVisible = true"
+        (mouseleave)="submenuVisible = false">
+        <div 
+          *ngFor="let collection of getAvailableCollections()"
+          class="context-menu-subitem"
+          (click)="addToCollection(collection.id)">
+          {{ collection.name }}
+        </div>
+      </div>
+    </div>
+    <div class="context-menu-item context-menu-item-disabled" *ngIf="getAvailableCollections().length === 0">
+      <div class="context-menu-label">No available collections</div>
+    </div>
   </div>
 </div>

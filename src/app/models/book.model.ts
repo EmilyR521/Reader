@@ -1,5 +1,6 @@
 import { BookStatus } from './book-status.model';
 import { BookRating } from './book-rating.model';
+import { BookOwned } from './book-owned.model';
 
 /**
  * Book Interface
@@ -18,4 +19,5 @@ export interface Book {
   tags?: string[];
   imageUrl?: string; // Cover image URL from Open Library
   rating?: BookRating;
+  owned?: BookOwned;
 }
