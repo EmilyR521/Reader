@@ -16,7 +16,23 @@ RUN npm ci
 COPY src ./src
 
 # Build Angular app for production
-RUN npm run build -- --configuration production
+RUN npm run build -- --configuration production || (echo "ERROR: Build failed!" && exit 1)
+
+# Verify build output exists
+RUN if [ ! -d "/app/dist/books-reading-list" ]; then \
+      echo "ERROR: Build output directory not found!" && \
+      echo "Contents of /app/dist:" && \
+      ls -la /app/dist/ && \
+      exit 1; \
+    fi
+
+# Debug: List build output to verify files
+RUN echo "=== Build output structure ===" && \
+    ls -la /app/dist/ && \
+    echo "=== Contents of books-reading-list ===" && \
+    ls -la /app/dist/books-reading-list/ && \
+    echo "=== Checking for index.html ===" && \
+    test -f /app/dist/books-reading-list/index.html || (echo "ERROR: index.html not found in build output!" && exit 1)
 
 # Stage 2: Serve with Nginx
 FROM nginx:alpine
@@ -26,6 +42,13 @@ RUN apk add --no-cache curl
 
 # Copy built app from builder stage
 COPY --from=builder /app/dist/books-reading-list /usr/share/nginx/html
+
+# Debug: Verify files were copied and set proper permissions
+RUN echo "=== Files in nginx html directory ===" && \
+    ls -la /usr/share/nginx/html/ && \
+    echo "=== Checking for index.html ===" && \
+    test -f /usr/share/nginx/html/index.html || (echo "ERROR: index.html not found!" && exit 1) && \
+    chmod -R 755 /usr/share/nginx/html
 
 # Copy nginx configuration
 COPY nginx.conf /etc/nginx/conf.d/default.conf

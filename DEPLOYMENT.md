@@ -130,6 +130,44 @@ docker-compose restart
 
 ## Troubleshooting
 
+### "Cannot GET /" Error
+
+If you see "Cannot GET /" when accessing the frontend:
+
+1. **Check if frontend container is running**
+   ```bash
+   docker-compose ps
+   ```
+
+2. **Check frontend logs for build errors**
+   ```bash
+   docker-compose logs frontend
+   ```
+   Look for errors during the build process or file copy operations.
+
+3. **Verify files were built and copied correctly**
+   ```bash
+   docker-compose exec frontend ls -la /usr/share/nginx/html/
+   ```
+   You should see `index.html` and other Angular build files.
+
+4. **Check nginx configuration**
+   ```bash
+   docker-compose exec frontend cat /etc/nginx/conf.d/default.conf
+   ```
+
+5. **Rebuild the frontend container**
+   ```bash
+   docker-compose down
+   docker-compose build --no-cache frontend
+   docker-compose up -d
+   ```
+
+6. **Check nginx error logs**
+   ```bash
+   docker-compose exec frontend cat /var/log/nginx/error.log
+   ```
+
 ### Containers won't start
 
 1. **Check logs**
@@ -152,6 +190,14 @@ docker-compose restart
    ```bash
    docker ps
    ```
+
+### Using the Debug Script
+
+A debug script is provided to help diagnose issues:
+```bash
+chmod +x docker-debug.sh
+./docker-debug.sh
+```
 
 ### Frontend can't connect to backend
 
