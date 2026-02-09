@@ -147,6 +147,35 @@
   font-weight: bold;
 }
 
+.json-import-container {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.json-import-help {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.json-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.json-actions .btn {
+  flex: 1;
+  min-width: 150px;
+}
+
+.json-actions .btn.disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 /* Mobile optimizations */
 @media (max-width: 768px) {
   .settings-view-container {

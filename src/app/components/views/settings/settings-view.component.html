@@ -113,6 +113,37 @@
           <span *ngIf="isLookingUpData">⏳ Looking up...</span>
         </button>
       </div>
+      <button class="settings-btn expander-btn" (click)="toggleJsonImportSection()" title="JSON Import">
+        <span class="settings-icon">📥</span>
+        <span class="settings-text">JSON Import</span>
+        <span class="expander-icon">{{ isJsonImportExpanded ? '▼' : '▶' }}</span>
+      </button>
+      <div class="expander-content" *ngIf="isJsonImportExpanded">
+        <div class="json-import-container">
+          <p class="json-import-help">
+            Export or import a complete user data file (JSON format). This includes books, collections, and user metadata.
+            When importing, you can choose to replace existing data or merge with it.
+          </p>
+          <div class="json-actions">
+            <button 
+              class="btn btn-primary" 
+              (click)="exportJson()"
+              [disabled]="isImportingJson">
+              💾 Export User Data (JSON)
+            </button>
+            <label class="btn btn-primary" [class.disabled]="isImportingJson">
+              <span *ngIf="!isImportingJson">📥 Import User Data (JSON)</span>
+              <span *ngIf="isImportingJson">⏳ Importing...</span>
+              <input 
+                type="file" 
+                accept=".json,application/json" 
+                (change)="importJson($event)"
+                style="display: none;"
+                [disabled]="isImportingJson">
+            </label>
+          </div>
+        </div>
+      </div>
     </div>
     
     <div class="settings-section">

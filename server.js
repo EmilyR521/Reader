@@ -221,6 +221,27 @@ app.get('/api/users', async (req, res) => {
   }
 });
 
+// GET /api/users/:username/export - Export user data as JSON
+app.get('/api/users/:username/export', async (req, res) => {
+  try {
+    const { username } = req.params;
+    
+    if (!username || !username.trim()) {
+      return res.status(400).json({ error: 'Username is required' });
+    }
+    
+    const sanitizedUser = username.trim().replace(/[^a-zA-Z0-9_-]/g, '_');
+    const userData = await readUserData(sanitizedUser);
+    
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Content-Disposition', `attachment; filename="${sanitizedUser}-backup.json"`);
+    res.json(userData);
+  } catch (error) {
+    console.error('Error exporting user data:', error);
+    res.status(500).json({ error: 'Failed to export user data' });
+  }
+});
+
 // POST /api/users - Create a new user with metadata
 app.post('/api/users', async (req, res) => {
   try {
@@ -250,6 +271,77 @@ app.post('/api/users', async (req, res) => {
   } catch (error) {
     console.error('Error creating user:', error);
     res.status(500).json({ error: 'Failed to create user' });
+  }
+});
+
+// POST /api/users/:username/import - Import user data from JSON
+app.post('/api/users/:username/import', async (req, res) => {
+  try {
+    const { username } = req.params;
+    const { userData, replaceExisting } = req.body;
+    
+    if (!username || !username.trim()) {
+      return res.status(400).json({ error: 'Username is required' });
+    }
+    
+    if (!userData) {
+      return res.status(400).json({ error: 'User data is required' });
+    }
+    
+    // Validate JSON structure
+    if (!userData.metadata || !userData.metadata.username) {
+      return res.status(400).json({ error: 'Invalid user data format: metadata.username is required' });
+    }
+    
+    if (!Array.isArray(userData.books)) {
+      return res.status(400).json({ error: 'Invalid user data format: books must be an array' });
+    }
+    
+    if (!Array.isArray(userData.collections)) {
+      return res.status(400).json({ error: 'Invalid user data format: collections must be an array' });
+    }
+    
+    const sanitizedUser = username.trim().replace(/[^a-zA-Z0-9_-]/g, '_');
+    
+    // If replaceExisting is false, merge with existing data
+    let finalData;
+    if (replaceExisting === false) {
+      const existingData = await readUserData(sanitizedUser);
+      
+      // Merge books (avoid duplicates based on id)
+      const existingBookIds = new Set(existingData.books.map(book => book.id));
+      const newBooks = userData.books.filter(book => !existingBookIds.has(book.id));
+      finalData = {
+        metadata: userData.metadata.username === sanitizedUser ? userData.metadata : existingData.metadata,
+        books: [...existingData.books, ...newBooks],
+        collections: [...existingData.collections, ...userData.collections]
+      };
+    } else {
+      // Replace existing data
+      finalData = {
+        metadata: {
+          username: sanitizedUser,
+          icon: userData.metadata.icon || '📚'
+        },
+        books: userData.books || [],
+        collections: userData.collections || []
+      };
+    }
+    
+    // Write the data
+    const dataFile = getUserDataFile(sanitizedUser);
+    await fs.mkdir(DATA_DIR, { recursive: true });
+    await fs.writeFile(dataFile, JSON.stringify(finalData, null, 2), 'utf8');
+    
+    res.status(200).json({
+      success: true,
+      message: replaceExisting === false ? 'User data merged successfully' : 'User data imported successfully',
+      booksCount: finalData.books.length,
+      collectionsCount: finalData.collections.length
+    });
+  } catch (error) {
+    console.error('Error importing user data:', error);
+    res.status(500).json({ error: 'Failed to import user data', details: error.message });
   }
 });
 

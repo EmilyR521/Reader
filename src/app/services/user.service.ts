@@ -68,4 +68,17 @@ export class UserService {
   createUser(username: string, icon: string): Observable<User> {
     return this.http.post<User>(this.API_URL, { username, icon });
   }
+
+  importUserData(username: string, userData: any, replaceExisting: boolean = true): Observable<any> {
+    return this.http.post<any>(`${this.API_URL}/${encodeURIComponent(username)}/import`, {
+      userData,
+      replaceExisting
+    });
+  }
+
+  exportUserData(username: string): Observable<Blob> {
+    return this.http.get(`${this.API_URL}/${encodeURIComponent(username)}/export`, {
+      responseType: 'blob'
+    });
+  }
 }

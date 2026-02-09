@@ -14,6 +14,8 @@ export class SettingsViewComponent implements OnInit, OnDestroy {
   isLookingUpData = false;
   isCsvExpanded = false;
   isLookupDataExpanded = false;
+  isJsonImportExpanded = false;
+  isImportingJson = false;
   lookupOptions = {
     covers: false,
     publicationDates: false
@@ -287,5 +289,119 @@ export class SettingsViewComponent implements OnInit, OnDestroy {
     // Clear the deferredPrompt
     this.deferredPrompt = null;
     this.showInstallButton = false;
+  }
+
+  toggleJsonImportSection(): void {
+    this.isJsonImportExpanded = !this.isJsonImportExpanded;
+  }
+
+  exportJson(): void {
+    const currentUser = this.userService.getCurrentUser();
+    
+    this.userService.exportUserData(currentUser).subscribe({
+      next: (blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `${currentUser}-backup.json`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+      },
+      error: (error) => {
+        console.error('Error exporting user data:', error);
+        alert('Failed to export user data. Please try again.');
+      }
+    });
+  }
+
+  importJson(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      const file = input.files[0];
+      
+      if (file.type !== 'application/json' && !file.name.endsWith('.json')) {
+        alert('Please select a valid JSON file.');
+        input.value = '';
+        return;
+      }
+
+      this.isImportingJson = true;
+      const reader = new FileReader();
+
+      reader.onload = (e: any) => {
+        try {
+          const jsonContent = e.target.result as string;
+          const userData = JSON.parse(jsonContent);
+
+          // Validate JSON structure
+          if (!userData.metadata || !userData.metadata.username) {
+            throw new Error('Invalid JSON format: metadata.username is required');
+          }
+
+          if (!Array.isArray(userData.books)) {
+            throw new Error('Invalid JSON format: books must be an array');
+          }
+
+          if (!Array.isArray(userData.collections)) {
+            throw new Error('Invalid JSON format: collections must be an array');
+          }
+
+          // Ask user if they want to replace or merge
+          const replaceExisting = confirm(
+            `Import data for user "${userData.metadata.username}"?\n\n` +
+            `Books: ${userData.books.length}\n` +
+            `Collections: ${userData.collections.length}\n\n` +
+            `Click OK to replace existing data, or Cancel to merge with existing data.`
+          );
+
+          const currentUser = this.userService.getCurrentUser();
+          const targetUser = userData.metadata.username.trim().replace(/[^a-zA-Z0-9_-]/g, '_');
+
+          this.userService.importUserData(targetUser, userData, replaceExisting).subscribe({
+            next: (result) => {
+              this.isImportingJson = false;
+              let message = `${result.message}\n\n`;
+              message += `Books: ${result.booksCount}\n`;
+              message += `Collections: ${result.collectionsCount}`;
+              
+              alert(message);
+              
+              // Reload users and switch to imported user if different
+              this.userService.loadUsers();
+              if (targetUser !== currentUser) {
+                if (confirm(`Switch to user "${targetUser}"?`)) {
+                  this.userService.setCurrentUser(targetUser);
+                }
+              } else {
+                // Reload books for current user
+                this.readingListService.loadBooks();
+              }
+              
+              input.value = '';
+            },
+            error: (error) => {
+              this.isImportingJson = false;
+              const errorMessage = error.error?.error || error.error?.details || error.message || 'Unknown error';
+              alert(`Failed to import JSON: ${errorMessage}`);
+              input.value = '';
+            }
+          });
+        } catch (error: any) {
+          this.isImportingJson = false;
+          alert(`Failed to parse JSON file: ${error.message || 'Invalid JSON format'}`);
+          input.value = '';
+        }
+      };
+
+      reader.onerror = () => {
+        this.isImportingJson = false;
+        alert('Failed to read JSON file');
+        input.value = '';
+      };
+
+      reader.readAsText(file, 'UTF-8');
+    }
   }
 }
