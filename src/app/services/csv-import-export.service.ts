@@ -34,11 +34,13 @@ export class CsvImportExportService {
    * Import books from CSV file
    * @param file CSV file to import
    * @param addBookCallback Callback function to add each book
+   * @param existingBooks Optional array of existing books to check for duplicates
    * @returns Observable with import results and progress updates
    */
   importFromCSV(
     file: File,
-    addBookCallback: (book: Omit<Book, 'id' | 'addedDate'>) => Observable<Book>
+    addBookCallback: (book: Omit<Book, 'id' | 'addedDate'>) => Observable<Book>,
+    existingBooks: Book[] = []
   ): Observable<ImportResult> {
     return new Observable(observer => {
       const reader = new FileReader();
@@ -46,7 +48,7 @@ export class CsvImportExportService {
       reader.onload = (e: any) => {
         try {
           const csv = e.target.result as string;
-          const result = this.processCSVImport(csv, addBookCallback);
+          const result = this.processCSVImport(csv, addBookCallback, existingBooks);
           result.subscribe({
             next: (importResult) => {
               observer.next(importResult);
@@ -133,7 +135,8 @@ export class CsvImportExportService {
    */
   private processCSVImport(
     csv: string,
-    addBookCallback: (book: Omit<Book, 'id' | 'addedDate'>) => Observable<Book>
+    addBookCallback: (book: Omit<Book, 'id' | 'addedDate'>) => Observable<Book>,
+    existingBooks: Book[] = []
   ): Observable<ImportResult> {
     return new Observable(observer => {
       const lines = this.splitCSVLines(csv);
@@ -154,6 +157,13 @@ export class CsvImportExportService {
       const errors: string[] = [];
       let successCount = 0;
       const booksToAdd: Omit<Book, 'id' | 'addedDate'>[] = [];
+      
+      // Create a set of existing book keys for quick lookup
+      const existingBookKeys = new Set(
+        existingBooks.map(book => 
+          (book.title || '').toLowerCase().trim() + '|' + (book.author || '').toLowerCase().trim()
+        )
+      );
 
       // Parse all rows first
       for (let i = 1; i < lines.length; i++) {
@@ -165,7 +175,15 @@ export class CsvImportExportService {
         try {
           const book = this.parseBookFromRow(line, headerMap, i + 1);
           if (book) {
-            booksToAdd.push(book);
+            // Check if book already exists
+            const bookKey = (book.title || '').toLowerCase().trim() + '|' + (book.author || '').toLowerCase().trim();
+            if (existingBookKeys.has(bookKey)) {
+              errors.push(`Row ${i + 1}: Book "${book.title}" by ${book.author} already exists and was skipped`);
+            } else {
+              booksToAdd.push(book);
+              // Add to existing set to prevent duplicates within the CSV itself
+              existingBookKeys.add(bookKey);
+            }
           }
         } catch (error: any) {
           const errorMsg = `Row ${i + 1}: ${error.message || 'Invalid data'}`;

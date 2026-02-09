@@ -38,17 +38,21 @@ export class CsvImportExportComponent implements OnInit {
     if (input.files && input.files.length > 0) {
       this.isLoading = true;
       
+      // Get existing books to check for duplicates
+      const existingBooks = this.readingListService.getBooks();
+      
       this.csvService.importFromCSV(
         input.files[0],
-        (book) => this.readingListService.addBook(book)
+        (book) => this.readingListService.addBook(book),
+        existingBooks
       ).subscribe({
         next: (result) => {
           this.isLoading = false;
           let message = `Successfully imported ${result.success} book(s).`;
           if (result.errors.length > 0) {
-            message += `\n\nErrors (${result.errors.length}):\n${result.errors.slice(0, 10).join('\n')}`;
+            message += `\n\nSkipped/Errors (${result.errors.length}):\n${result.errors.slice(0, 10).join('\n')}`;
             if (result.errors.length > 10) {
-              message += `\n... and ${result.errors.length - 10} more errors`;
+              message += `\n... and ${result.errors.length - 10} more`;
             }
           }
           alert(message);
