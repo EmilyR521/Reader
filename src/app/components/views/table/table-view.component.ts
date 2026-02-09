@@ -46,6 +46,13 @@ export class TableViewComponent implements OnInit, OnDestroy {
   showFooterCollectionMenu = false;
   isAddingToCollection = false;
   
+  // Tag dropdown state
+  tagDropdownVisible = false;
+  tagDropdownBook: Book | null = null;
+  tagDropdownX = 0;
+  tagDropdownY = 0;
+  availableTags: string[] = [];
+  
   private booksSubscription?: Subscription;
   private collectionsSubscription?: Subscription;
 
@@ -58,12 +65,23 @@ export class TableViewComponent implements OnInit, OnDestroy {
     this.booksSubscription = this.readingListService.books$.subscribe(books => {
       this.books = books;
       this.applyFiltersAndSort();
+      this.extractAvailableTags();
     });
 
     // Load collections for context menu
     this.collectionsSubscription = this.collectionService.collections$.subscribe(collections => {
       this.collections = collections;
     });
+  }
+  
+  extractAvailableTags(): void {
+    const tagSet = new Set<string>();
+    this.books.forEach(book => {
+      if (book.tags && book.tags.length > 0) {
+        book.tags.forEach(tag => tagSet.add(tag));
+      }
+    });
+    this.availableTags = Array.from(tagSet).sort();
   }
 
   ngOnDestroy(): void {
@@ -86,6 +104,13 @@ export class TableViewComponent implements OnInit, OnDestroy {
       const target = event.target as HTMLElement;
       if (!target.closest('.footer-collection-menu-wrapper')) {
         this.closeFooterCollectionMenu();
+      }
+    }
+    // Close tag dropdown when clicking outside
+    if (this.tagDropdownVisible) {
+      const target = event.target as HTMLElement;
+      if (!target.closest('.tag-dropdown') && !target.closest('.tags-cell.empty-tags')) {
+        this.closeTagDropdown();
       }
     }
   }
@@ -505,6 +530,86 @@ export class TableViewComponent implements OnInit, OnDestroy {
   hasActiveFilters(): boolean {
     return this.activeFilters.length > 0 || this.selectedYear !== null || 
            this.dateRangeStart !== null || this.dateRangeEnd !== null;
+  }
+
+  onTagsCellClick(event: MouseEvent, book: Book): void {
+    // Only open dropdown if clicking on empty space (not on existing tags)
+    const target = event.target as HTMLElement;
+    if (target.classList.contains('tag') || target.closest('.tag')) {
+      return; // Clicked on an existing tag, don't open dropdown
+    }
+    
+    event.preventDefault();
+    event.stopPropagation();
+    
+    this.tagDropdownBook = book;
+    
+    // Position dropdown near the click
+    const cellRect = (event.currentTarget as HTMLElement).getBoundingClientRect();
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+    const dropdownWidth = 250;
+    const dropdownHeight = 300;
+    
+    let x = cellRect.left;
+    let y = cellRect.bottom + 4;
+    
+    // Adjust if dropdown would go off right edge
+    if (x + dropdownWidth > viewportWidth) {
+      x = viewportWidth - dropdownWidth - 10;
+    }
+    
+    // Adjust if dropdown would go off bottom edge
+    if (y + dropdownHeight > viewportHeight) {
+      y = cellRect.top - dropdownHeight - 4;
+    }
+    
+    this.tagDropdownX = x;
+    this.tagDropdownY = y;
+    this.tagDropdownVisible = true;
+  }
+
+  closeTagDropdown(): void {
+    this.tagDropdownVisible = false;
+    this.tagDropdownBook = null;
+  }
+
+  getAvailableTagsForBook(book: Book): string[] {
+    if (!book.tags || book.tags.length === 0) {
+      return this.availableTags;
+    }
+    // Return tags that aren't already on the book
+    return this.availableTags.filter(tag => !book.tags!.includes(tag));
+  }
+
+  addTagToBook(tag: string): void {
+    if (!this.tagDropdownBook) {
+      return;
+    }
+    
+    const book = this.tagDropdownBook;
+    const currentTags = book.tags || [];
+    
+    // Don't add if tag already exists
+    if (currentTags.includes(tag)) {
+      this.closeTagDropdown();
+      return;
+    }
+    
+    // Add the tag
+    const updatedTags = [...currentTags, tag];
+    
+    // Update the book
+    this.readingListService.updateBook(book.id, { tags: updatedTags })
+      .subscribe({
+        next: () => {
+          this.closeTagDropdown();
+        },
+        error: (error) => {
+          console.error('Error adding tag to book:', error);
+          alert('Failed to add tag. Please try again.');
+        }
+      });
   }
 
 }

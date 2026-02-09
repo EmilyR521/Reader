@@ -196,6 +196,16 @@
 
 .tags-cell {
   overflow: hidden;
+  position: relative;
+}
+
+.tags-cell.empty-tags {
+  cursor: pointer;
+  min-height: 24px;
+}
+
+.tags-cell.empty-tags:hover .empty {
+  color: var(--accent-color);
 }
 
 .tags-cell .tag {
@@ -207,10 +217,11 @@
   white-space: nowrap;
 }
 
-
 .tags-cell .empty {
   color: var(--text-tertiary);
   font-style: italic;
+  display: inline-block;
+  padding: 2px 4px;
 }
 
 .empty-row {
@@ -493,4 +504,81 @@
 .context-menu-item-disabled .context-menu-label {
   color: var(--text-secondary);
   font-style: italic;
+}
+
+/* Tag Dropdown */
+.tag-dropdown {
+  position: fixed;
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  min-width: 250px;
+  max-width: 300px;
+  max-height: 300px;
+  display: flex;
+  flex-direction: column;
+}
+
+.tag-dropdown-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.tag-dropdown-title {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+}
+
+.tag-dropdown-close {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.tag-dropdown-close:hover {
+  background: var(--form-bg);
+  color: var(--text-primary);
+}
+
+.tag-dropdown-content {
+  padding: 4px 0;
+  max-height: 250px;
+  overflow-y: auto;
+}
+
+.tag-dropdown-empty {
+  padding: 20px 16px;
+  text-align: center;
+  color: var(--text-secondary);
+  font-style: italic;
+  font-size: 0.85rem;
+}
+
+.tag-dropdown-item {
+  padding: 8px 16px;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: background 0.2s ease;
+  font-size: 0.9rem;
+}
+
+.tag-dropdown-item:hover {
+  background: var(--form-bg);
+  color: var(--accent-color);
 }

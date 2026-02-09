@@ -51,15 +51,15 @@
             </span>
             <span *ngIf="!book.rating || book.rating === BookRating.None" class="empty">—</span>
           </td>
-          <td class="tags-cell">
+          <td class="tags-cell" [class.empty-tags]="!book.tags || book.tags.length === 0" (click)="onTagsCellClick($event, book)">
             <span 
               *ngFor="let tag of book.tags" 
               class="tag clickable-tag"
-              (click)="filterControls.filterByTag(tag, $event)"
+              (click)="filterControls.filterByTag(tag, $event); $event.stopPropagation()"
               [title]="'Click to filter by ' + tag">
               {{ tag }}
             </span>
-            <span *ngIf="!book.tags || book.tags.length === 0" class="empty">—</span>
+            <span *ngIf="!book.tags || book.tags.length === 0" class="empty" [title]="'Click to add tags'">—</span>
           </td>
         </tr>
         <tr *ngIf="sortedBooks.length === 0" class="empty-row">
@@ -144,6 +144,32 @@
       *ngIf="selectedBook"
       (click)="findOnWoB(selectedBook)">
       <div class="context-menu-label">Find on WoB</div>
+    </div>
+  </div>
+
+  <!-- Tag Dropdown -->
+  <div 
+    class="tag-dropdown" 
+    *ngIf="tagDropdownVisible && tagDropdownBook"
+    [style.left.px]="tagDropdownX"
+    [style.top.px]="tagDropdownY"
+    (click)="$event.stopPropagation()">
+    <div class="tag-dropdown-header">
+      <span class="tag-dropdown-title">Add Tag</span>
+      <button class="tag-dropdown-close" (click)="closeTagDropdown()" title="Close">✕</button>
+    </div>
+    <div class="tag-dropdown-content">
+      <div 
+        *ngIf="getAvailableTagsForBook(tagDropdownBook!).length === 0" 
+        class="tag-dropdown-empty">
+        No tags available. Tags will appear here as you add them to books.
+      </div>
+      <div 
+        *ngFor="let tag of getAvailableTagsForBook(tagDropdownBook!)"
+        class="tag-dropdown-item"
+        (click)="addTagToBook(tag)">
+        {{ tag }}
+      </div>
     </div>
   </div>
 </div>
