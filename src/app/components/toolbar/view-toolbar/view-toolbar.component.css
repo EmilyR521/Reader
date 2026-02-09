@@ -1,7 +1,1 @@
-/* Component-specific overrides only */
 
-@media (max-width: 600px) {
-  .view-label {
-    display: inline; /* Keep labels visible on mobile for better UX */
-  }
-}

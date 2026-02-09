@@ -52,15 +52,38 @@ export class BookLookupService {
       'User-Agent': this.USER_AGENT
     });
 
+    // Normalize title for exact matching (lowercase, trim)
+    const normalizedTitle = title.toLowerCase().trim();
+
     return this.http.get<OpenLibrarySearchResponse>(url, { headers }).pipe(
       map(response => {
         if (response.docs && response.docs.length > 0) {
-          // Find the best match (first result usually has cover_i)
+          // First, try to find an exact title match with a cover
+          const exactMatch = response.docs.find(doc => {
+            const docTitle = doc.title?.toLowerCase().trim();
+            return docTitle === normalizedTitle && doc.cover_i;
+          });
+
+          if (exactMatch && exactMatch.cover_i) {
+            // Construct cover URL: https://covers.openlibrary.org/b/id/{cover_i}-M.jpg
+            // M = Medium size, can also use S (small), L (large)
+            return `${this.COVER_BASE_URL}${exactMatch.cover_i}-M.jpg`;
+          }
+
+          // If no exact match with cover, try exact match without cover requirement
+          const exactMatchNoCover = response.docs.find(doc => {
+            const docTitle = doc.title?.toLowerCase().trim();
+            return docTitle === normalizedTitle;
+          });
+
+          if (exactMatchNoCover && exactMatchNoCover.cover_i) {
+            return `${this.COVER_BASE_URL}${exactMatchNoCover.cover_i}-M.jpg`;
+          }
+
+          // Fall back to first result with cover_i, or first result
           const book = response.docs.find(doc => doc.cover_i) || response.docs[0];
           
           if (book.cover_i) {
-            // Construct cover URL: https://covers.openlibrary.org/b/id/{cover_i}-M.jpg
-            // M = Medium size, can also use S (small), L (large)
             return `${this.COVER_BASE_URL}${book.cover_i}-M.jpg`;
           }
         }
