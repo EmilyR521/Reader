@@ -612,4 +612,11 @@ export class TableViewComponent implements OnInit, OnDestroy {
       });
   }
 
+  openFilterForField(fieldName: 'title' | 'author' | 'status' | 'tags' | 'dateRangeStart' | 'dateRangeEnd', event: MouseEvent): void {
+    event.stopPropagation(); // Prevent sorting when clicking the filter icon
+    if (this.filterControlsComponent) {
+      this.filterControlsComponent.openAndFocusField(fieldName);
+    }
+  }
+
 }

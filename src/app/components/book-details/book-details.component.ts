@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, OnInit, OnDestroy, OnChanges, SimpleChanges, HostListener } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, OnDestroy, OnChanges, SimpleChanges, HostListener, ViewChild } from '@angular/core';
 import { ReadingListService } from '../../services/reading-list.service';
 import { CollectionService } from '../../services/collection.service';
 import { Book } from '../../models/book.model';
@@ -6,6 +6,7 @@ import { BookStatus } from '../../models/book-status.model';
 import { BookRating } from '../../models/book-rating.model';
 import { Collection } from '../../models/collection.model';
 import { Subscription } from 'rxjs';
+import { BookDetailsFormComponent } from './book-details-form/book-details-form.component';
 
 @Component({
   selector: 'app-book-details',
@@ -16,7 +17,7 @@ export class BookDetailsComponent implements OnInit, OnDestroy, OnChanges {
   @Input() book: Book | null = null;
   @Input() isOpen: boolean = false;
   @Output() closed = new EventEmitter<void>();
-  @Output() bookSaved = new EventEmitter<void>();
+  @Output() bookSaved = new EventEmitter<Book>();
   @Output() bookDeleted = new EventEmitter<string>();
 
   isLoading = false;
@@ -28,6 +29,8 @@ export class BookDetailsComponent implements OnInit, OnDestroy, OnChanges {
   collections: Collection[] = [];
   showCollectionMenu = false;
   private collectionsSubscription?: Subscription;
+  
+  @ViewChild(BookDetailsFormComponent) formComponent?: BookDetailsFormComponent;
 
   constructor(
     private readingListService: ReadingListService,
@@ -120,10 +123,22 @@ export class BookDetailsComponent implements OnInit, OnDestroy, OnChanges {
       };
 
       this.readingListService.addBook(bookToAdd).subscribe({
-        next: () => {
+        next: (newBook) => {
           this.isLoading = false;
-          this.bookSaved.emit();
-          this.close();
+          // Clear the form
+          if (this.formComponent) {
+            this.formComponent.resetForm();
+          }
+          // Parse dates properly
+          const parsedBook: Book = {
+            ...newBook,
+            addedDate: newBook.addedDate ? new Date(newBook.addedDate) : new Date(),
+            publishedDate: newBook.publishedDate ? new Date(newBook.publishedDate) : undefined,
+            readingStartDate: newBook.readingStartDate ? new Date(newBook.readingStartDate) : undefined,
+            readingEndDate: newBook.readingEndDate ? new Date(newBook.readingEndDate) : undefined,
+            imageUrl: newBook.imageUrl || undefined
+          };
+          this.bookSaved.emit(parsedBook);
         },
         error: (error) => {
           console.error('Error adding book:', error);

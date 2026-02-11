@@ -14,62 +14,6 @@
   margin: 0;
 }
 
-/* User Select Component */
-.user-select-wrapper {
-  margin-bottom: 20px;
-}
-
-.user-select-label {
-  display: block;
-  margin-bottom: 8px;
-  color: var(--text-primary);
-  font-weight: 600;
-  font-size: 0.95rem;
-}
-
-.select-wrapper-custom {
-  position: relative;
-  width: 100%;
-}
-
-.select-wrapper-custom::after {
-  content: '▼';
-  position: absolute;
-  right: 16px;
-  top: 50%;
-  transform: translateY(-50%);
-  pointer-events: none;
-  color: var(--text-secondary);
-  font-size: 0.75rem;
-  z-index: 1;
-}
-
-.user-select {
-  width: 100%;
-  padding: 12px 40px 12px 16px;
-  background: var(--input-bg);
-  border: 1px solid var(--input-border);
-  border-radius: 8px;
-  font-size: 0.95rem;
-  color: var(--text-primary);
-  cursor: pointer;
-  transition: all 0.3s ease;
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-}
-
-.user-select:hover {
-  background: var(--form-bg);
-  border-color: var(--accent-color);
-}
-
-.user-select:focus {
-  outline: none;
-  border-color: var(--accent-color);
-  box-shadow: 0 0 0 3px var(--focus-shadow);
-}
-
 .user-name-input {
   width: 100%;
   padding: 12px;

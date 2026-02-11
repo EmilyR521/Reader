@@ -1,0 +1,305 @@
+/* Rating buttons */
+.rating-buttons {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.rating-btn {
+  padding: 10px 16px;
+  background: var(--card-bg);
+  color: var(--text-primary);
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1.5rem;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 50px;
+  height: 50px;
+}
+
+.rating-btn:hover {
+  background: var(--form-bg);
+  border-color: var(--accent-color);
+  transform: scale(1.1);
+}
+
+.rating-btn.active,
+.rating-btn.selected {
+  background: var(--accent-color);
+  border-color: var(--accent-color);
+  box-shadow: 0 2px 8px rgba(139, 111, 71, 0.3);
+}
+
+.rating-btn.rating-positive.active {
+  background: #6b8e23;
+  border-color: #6b8e23;
+}
+
+.rating-btn.rating-negative.active {
+  background: #dc3545;
+  border-color: #dc3545;
+}
+
+.rating-btn.rating-favourite.active {
+  background: #e91e63;
+  border-color: #e91e63;
+}
+
+
+
+/* ============================================================================
+   BUTTONS - Base & Variants
+   ============================================================================ */
+.btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  text-align: center;
+  display: inline-block;
+  min-height: 44px; /* Minimum touch target */
+  touch-action: manipulation; /* Prevent double-tap zoom */
+}
+
+@media (max-width: 768px) {
+  .btn {
+    padding: 12px 20px;
+    min-height: 48px;
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .btn {
+    padding: 14px 20px;
+    min-height: 52px;
+    font-size: 1.05rem;
+    width: 100%; /* Full width on very small screens */
+  }
+}
+
+.btn-small {
+  padding: 8px 16px;
+  font-size: 0.9rem;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background: var(--border-color);
+}
+
+/* Base button pattern with accent color */
+.btn-accent {
+  background: var(--accent-color);
+  color: var(--btn-text);
+  border: 1px solid rgba(44, 24, 16, 0.3);
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  box-shadow: 
+    0 2px 4px var(--btn-shadow),
+    inset 0 1px 2px var(--btn-shadow-inset);
+}
+
+.btn-accent:hover:not(:disabled) {
+  background: var(--btn-hover);
+  transform: translateY(-2px);
+  box-shadow: 
+    0 4px 8px var(--btn-shadow),
+    inset 0 1px 2px var(--btn-shadow-inset);
+}
+
+/* Button variants */
+.btn-primary {
+  background: var(--accent-color);
+  color: var(--btn-text);
+  border: 1px solid rgba(44, 24, 16, 0.3);
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  box-shadow: 
+    0 2px 4px var(--btn-shadow),
+    inset 0 1px 2px var(--btn-shadow-inset);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--btn-hover);
+  transform: translateY(-2px);
+  box-shadow: 
+    0 4px 8px var(--btn-shadow),
+    inset 0 1px 2px var(--btn-shadow-inset);
+}
+
+.btn-success {
+  background: #6b8e23;
+  color: var(--btn-text);
+  border: 1px solid rgba(44, 24, 16, 0.3);
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  box-shadow: 
+    0 2px 4px var(--btn-shadow),
+    inset 0 1px 2px var(--btn-shadow-inset);
+}
+
+.btn-success:hover:not(:disabled) {
+  background: #5a7a1a;
+  box-shadow: 
+    0 3px 6px var(--btn-shadow),
+    inset 0 1px 2px var(--btn-shadow-inset);
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  background: #6c757d;
+  color: white;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: #5a6268;
+}
+
+.btn-danger {
+  background: #dc3545;
+  color: white;
+}
+
+.btn-danger:hover:not(:disabled) {
+  background: #c82333;
+}
+
+.btn-edit {
+  background: #8b7355;
+  color: var(--btn-text);
+  border: 1px solid rgba(44, 24, 16, 0.2);
+  box-shadow: 
+    0 2px 4px var(--btn-shadow),
+    inset 0 1px 2px var(--btn-shadow-inset);
+}
+
+.btn-edit:hover:not(:disabled) {
+  background: var(--btn-hover);
+  box-shadow: 
+    0 3px 6px var(--btn-shadow),
+    inset 0 1px 2px var(--btn-shadow-inset);
+  transform: translateY(-1px);
+}
+
+/* Button groups */
+.btn-csv,
+.lookup-btn,
+.clear-filters-btn {
+  background: var(--accent-color);
+  color: var(--btn-text);
+  border: 1px solid rgba(44, 24, 16, 0.3);
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  transition: all 0.3s ease;
+  box-shadow: 
+    0 2px 4px var(--btn-shadow),
+    inset 0 1px 2px var(--btn-shadow-inset);
+  padding: 10px 16px;
+}
+
+.btn-csv:hover:not(:disabled),
+.lookup-btn:hover:not(:disabled),
+.clear-filters-btn:hover:not(:disabled) {
+  background: var(--btn-hover);
+  box-shadow: 
+    0 3px 6px var(--btn-shadow),
+    inset 0 1px 2px var(--btn-shadow-inset);
+  transform: translateY(-1px);
+}
+
+.btn-csv:disabled,
+.lookup-btn:disabled,
+.clear-filters-btn:disabled {
+  background: var(--border-color);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.btn-csv {
+  width: 100%;
+  text-align: left;
+}
+
+.btn-csv label {
+  cursor: pointer;
+  margin: 0;
+}
+
+.lookup-btn {
+  width: 100%;
+}
+
+/* Minimal theme button overrides */
+.minimal-light .btn-primary {
+  background: #000000;
+  color: #ffffff;
+  border: 1px solid #000000;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.minimal-light .btn-primary:hover:not(:disabled) {
+  background: #333333;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.minimal-dark .btn-primary,
+.minimal-dark .btn-csv,
+.minimal-dark .lookup-btn,
+.minimal-dark .clear-filters-btn {
+  background: #ffffff;
+  color: #000000;
+  border: 1px solid #ffffff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.minimal-dark .btn-primary:hover:not(:disabled),
+.minimal-dark .btn-csv:hover:not(:disabled),
+.minimal-dark .lookup-btn:hover:not(:disabled),
+.minimal-dark .clear-filters-btn:hover:not(:disabled) {
+  background: #e0e0e0;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+}
+
+.minimal-dark .btn-success {
+  background: #4a7c2a;
+  color: #ffffff;
+  border: 1px solid #4a7c2a;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.minimal-dark .btn-success:hover:not(:disabled) {
+  background: #3a6a1a;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+}
+
+.minimal-dark .btn-secondary {
+  background: #666666;
+  color: #ffffff;
+  border: 1px solid #666666;
+}
+
+.minimal-dark .btn-secondary:hover:not(:disabled) {
+  background: #555555;
+}
+
+.minimal-dark .btn-danger {
+  background: #dc3545;
+  color: #ffffff;
+  border: 1px solid #dc3545;
+}
+
+.minimal-dark .btn-danger:hover:not(:disabled) {
+  background: #c82333;
+}

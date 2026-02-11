@@ -1,1 +1,33 @@
 
+
+.view-toolbar {
+  flex: 1;
+  min-width: 0; /* Allow flex item to shrink */
+}
+
+.view-buttons {
+  display: flex;
+  justify-content: flex-start;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.view-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: var(--card-bg);
+  color: var(--text-primary);
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: 'Georgia', 'Times New Roman', 'Palatino Linotype', 'Book Antiqua', Palatino, serif;
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(44, 24, 16, 0.1);
+  min-height: 44px; /* Minimum touch target */
+  touch-action: manipulation; /* Prevent double-tap zoom */
+  white-space: nowrap; /* Prevent text wrapping */
+}

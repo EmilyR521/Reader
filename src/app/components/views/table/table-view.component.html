@@ -10,24 +10,64 @@
       <thead>
         <tr>
           <th class="sortable" (click)="sortBy('title')">
-            Title <span class="sort-icon">{{ getSortIcon('title') }}</span>
+            <span class="header-content">
+              <span>Title</span>
+              <span class="sort-icon">{{ getSortIcon('title') }}</span>
+            </span>
+            <button class="filter-icon-btn" (click)="openFilterForField('title', $event)" title="Filter by title">
+              <span class="filter-icon">🔍</span>
+            </button>
           </th>
           <th class="sortable" (click)="sortBy('author')">
-            Author <span class="sort-icon">{{ getSortIcon('author') }}</span>
+            <span class="header-content">
+              <span>Author</span>
+              <span class="sort-icon">{{ getSortIcon('author') }}</span>
+            </span>
+            <button class="filter-icon-btn" (click)="openFilterForField('author', $event)" title="Filter by author">
+              <span class="filter-icon">🔍</span>
+            </button>
           </th>
           <th class="sortable" (click)="sortBy('status')">
-            Status <span class="sort-icon">{{ getSortIcon('status') }}</span>
+            <span class="header-content">
+              <span>Status</span>
+              <span class="sort-icon">{{ getSortIcon('status') }}</span>
+            </span>
+            <button class="filter-icon-btn" (click)="openFilterForField('status', $event)" title="Filter by status">
+              <span class="filter-icon">🔍</span>
+            </button>
           </th>
           <th class="sortable" (click)="sortBy('readingStartDate')">
-            Started <span class="sort-icon">{{ getSortIcon('readingStartDate') }}</span>
+            <span class="header-content">
+              <span>Started</span>
+              <span class="sort-icon">{{ getSortIcon('readingStartDate') }}</span>
+            </span>
+            <button class="filter-icon-btn" (click)="openFilterForField('dateRangeStart', $event)" title="Filter by start date">
+              <span class="filter-icon">🔍</span>
+            </button>
           </th>
           <th class="sortable" (click)="sortBy('readingEndDate')">
-            Finished <span class="sort-icon">{{ getSortIcon('readingEndDate') }}</span>
+            <span class="header-content">
+              <span>Finished</span>
+              <span class="sort-icon">{{ getSortIcon('readingEndDate') }}</span>
+            </span>
+            <button class="filter-icon-btn" (click)="openFilterForField('dateRangeEnd', $event)" title="Filter by end date">
+              <span class="filter-icon">🔍</span>
+            </button>
           </th>
           <th class="sortable" (click)="sortBy('rating')">
-            Rating <span class="sort-icon">{{ getSortIcon('rating') }}</span>
+            <span class="header-content">
+              <span>Rating</span>
+              <span class="sort-icon">{{ getSortIcon('rating') }}</span>
+            </span>
           </th>
-          <th>Tags</th>
+          <th>
+            <span class="header-content">
+              <span>Tags</span>
+            </span>
+            <button class="filter-icon-btn" (click)="openFilterForField('tags', $event)" title="Filter by tags">
+              <span class="filter-icon">🔍</span>
+            </button>
+          </th>
         </tr>
       </thead>
       <tbody>

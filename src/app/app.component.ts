@@ -98,11 +98,15 @@ export class AppComponent implements OnInit, OnDestroy {
     this.isAddingBook = false;
   }
 
-  onBookSaved(): void {
-    // Book saved, keep drawer open if editing, close if adding
+  onBookSaved(book: Book): void {
+    // Book saved
     if (this.isAddingBook) {
-      this.onBookDetailsClosed();
+      // When adding a new book, show it in the drawer and clear the form
+      this.selectedBook = book;
+      this.isAddingBook = false;
+      // The book-details component will switch to view mode automatically
     }
+    // If editing, the drawer stays open in view mode (handled by book-details component)
   }
 
   onBookDeleted(id: string): void {

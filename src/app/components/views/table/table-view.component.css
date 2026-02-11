@@ -37,7 +37,7 @@
 }
 
 .books-table th {
-  padding: 10px 12px;
+  padding: 10px 32px 10px 12px;
   text-align: left;
   font-weight: 700;
   color: var(--text-primary);
@@ -47,6 +47,7 @@
   font-size: 0.85rem;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  position: relative;
 }
 
 .books-table th:nth-child(1) {
@@ -89,11 +90,50 @@
   background: var(--card-bg);
 }
 
+.header-content {
+  display: inline-flex;
+  align-items: center;
+}
+
 .sort-icon {
   margin-left: 6px;
   font-size: 0.9rem;
   color: var(--accent-color);
   font-weight: normal;
+}
+
+.filter-icon-btn {
+  background: none;
+  border: none;
+  padding: 4px 6px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: auto;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  opacity: 0.6;
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.filter-icon-btn:hover {
+  opacity: 1;
+  background: var(--card-bg);
+}
+
+.filter-icon {
+  font-size: 0.85rem;
+  line-height: 1;
+  display: inline-block;
+}
+
+.books-table th.sortable:hover .filter-icon-btn,
+.books-table th:hover .filter-icon-btn {
+  opacity: 0.8;
 }
 
 .books-table tbody tr {

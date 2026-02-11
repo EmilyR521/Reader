@@ -49,6 +49,10 @@ export class FilterControlsComponent implements OnChanges {
 
   @ViewChild('statusDropdown', { static: false }) statusDropdown?: ElementRef;
   @ViewChild('tagsDropdown', { static: false }) tagsDropdown?: ElementRef;
+  @ViewChild('titleFilterInput', { static: false }) titleFilterInput?: ElementRef<HTMLInputElement>;
+  @ViewChild('authorFilterInput', { static: false }) authorFilterInput?: ElementRef<HTMLInputElement>;
+  @ViewChild('tableDateRangeStartInput', { static: false }) tableDateRangeStartInput?: ElementRef<HTMLInputElement>;
+  @ViewChild('tableDateRangeEndInput', { static: false }) tableDateRangeEndInput?: ElementRef<HTMLInputElement>;
 
   constructor(private elementRef: ElementRef) {}
 
@@ -432,5 +436,54 @@ export class FilterControlsComponent implements OnChanges {
     const dateObj = date instanceof Date ? date : new Date(date);
     if (isNaN(dateObj.getTime())) return '';
     return dateObj.toISOString().split('T')[0];
+  }
+
+  /**
+   * Opens the filter panel and focuses/selects the specified field
+   * @param fieldName - The name of the field to focus: 'title', 'author', 'status', 'tags', 'dateRangeStart', 'dateRangeEnd'
+   */
+  openAndFocusField(fieldName: 'title' | 'author' | 'status' | 'tags' | 'dateRangeStart' | 'dateRangeEnd'): void {
+    if (this.mode !== 'table') {
+      return;
+    }
+
+    // Open the filter panel if it's not already open
+    if (!this.isExpanded) {
+      this.isExpanded = true;
+    }
+
+    // Use setTimeout to ensure the DOM is updated after the expander opens
+    setTimeout(() => {
+      switch (fieldName) {
+        case 'title':
+          if (this.titleFilterInput?.nativeElement) {
+            this.titleFilterInput.nativeElement.focus();
+            this.titleFilterInput.nativeElement.select();
+          }
+          break;
+        case 'author':
+          if (this.authorFilterInput?.nativeElement) {
+            this.authorFilterInput.nativeElement.focus();
+            this.authorFilterInput.nativeElement.select();
+          }
+          break;
+        case 'status':
+          this.toggleStatusDropdown();
+          break;
+        case 'tags':
+          this.toggleTagsDropdown();
+          break;
+        case 'dateRangeStart':
+          if (this.tableDateRangeStartInput?.nativeElement) {
+            this.tableDateRangeStartInput.nativeElement.focus();
+          }
+          break;
+        case 'dateRangeEnd':
+          if (this.tableDateRangeEndInput?.nativeElement) {
+            this.tableDateRangeEndInput.nativeElement.focus();
+          }
+          break;
+      }
+    }, 100);
   }
 }

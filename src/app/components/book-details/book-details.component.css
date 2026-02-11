@@ -246,7 +246,6 @@
   border-color: #e91e63;
 }
 
-
 .cover-placeholder {
   display: flex;
   flex-direction: column;
@@ -309,7 +308,6 @@
 .lookup-option:hover {
   background: var(--card-bg);
 }
-
 
 .tab-btn {
   padding: 8px 16px;

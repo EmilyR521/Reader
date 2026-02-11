@@ -41,7 +41,7 @@
       [book]="selectedBook"
       [isOpen]="isBookDetailsOpen"
       (closed)="onBookDetailsClosed()"
-      (bookSaved)="onBookSaved()"
+      (bookSaved)="onBookSaved($event)"
       (bookDeleted)="onBookDeleted($event)">
     </app-book-details>
   </div>
