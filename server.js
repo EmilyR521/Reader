@@ -4,8 +4,8 @@ const path = require('path');
 const cors = require('cors');
 
 const app = express();
-const PORT = 3000;
-const DATA_DIR = path.join(__dirname, 'data');
+const PORT = parseInt(process.env.PORT || '3000', 10);
+const DATA_DIR = process.env.DATA_DIR || path.join(__dirname, 'data');
 const DEFAULT_USER = 'Test';
 
 // Middleware
@@ -648,21 +648,37 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', message: 'Server is running' });
 });
 
-// Start server
-async function startServer() {
-  try {
-    // Ensure data directory exists before starting server
-    await ensureDataDirectory();
-    
-    app.listen(PORT, () => {
-      console.log(`\n✓ Server is running on http://localhost:${PORT}`);
-      console.log(`✓ Data directory: ${DATA_DIR}\n`);
-    });
-  } catch (error) {
-    console.error('\n✗ Failed to start server:', error);
-    console.error('  Please check that the data directory can be created and is writable.');
-    process.exit(1); // Exit with error code
-  }
+// Serve Angular static files when running inside Electron (must be after API routes)
+if (process.env.STATIC_PATH) {
+  app.use(express.static(process.env.STATIC_PATH));
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(process.env.STATIC_PATH, 'index.html'));
+  });
 }
 
-startServer().catch(console.error);
+// Start server – returns a Promise that resolves when listening (for Electron)
+async function startServer() {
+  await ensureDataDirectory();
+
+  return new Promise((resolve, reject) => {
+    const server = app.listen(PORT, () => {
+      console.log(`\n✓ Server is running on http://localhost:${PORT}`);
+      console.log(`✓ Data directory: ${DATA_DIR}\n`);
+      resolve(server);
+    });
+    server.on('error', (err) => {
+      console.error('\n✗ Failed to start server:', err);
+      reject(err);
+    });
+  });
+}
+
+// Run server when this file is executed directly (e.g. node server.js)
+if (require.main === module) {
+  startServer().catch((err) => {
+    console.error('  Please check that the data directory can be created and is writable.');
+    process.exit(1);
+  });
+}
+
+module.exports = { app, startServer };

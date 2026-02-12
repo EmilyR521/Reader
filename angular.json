@@ -27,6 +27,7 @@
             "assets": [
               "src/favicon.ico",
               "src/favicon.svg",
+              "src/icons",
               "src/assets",
               "src/manifest.json",
               {

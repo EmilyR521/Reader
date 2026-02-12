@@ -190,6 +190,54 @@
   transform: translateY(-1px);
 }
 
+
+.btn-save,
+.btn-cancel {
+  padding: 6px 12px;
+  border: 2px solid var(--border-color);
+  border-radius: 6px;
+  background: var(--card-bg);
+  color: var(--text-primary);
+  cursor: pointer;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+}
+
+.btn-save:hover {
+  background: var(--accent-color);
+  border-color: var(--accent-color);
+}
+
+.btn-cancel:hover {
+  background: var(--error-color, #8b2e2e);
+  border-color: var(--error-color, #8b2e2e);
+}
+
+.btn-icon {
+  padding: 8px;
+  background: transparent;
+  border: 2px solid var(--border-color);
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1.1rem;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 36px;
+  min-height: 36px;
+}
+
+.btn-icon:hover {
+  background: var(--toggle-bg-hover);
+  transform: scale(1.05);
+}
+
+.btn-danger:hover {
+  background: var(--error-color, #8b2e2e);
+  border-color: var(--error-color, #8b2e2e);
+}
+
 /* Button groups */
 .btn-csv,
 .lookup-btn,

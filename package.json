@@ -2,12 +2,20 @@
   "name": "books-reading-list",
   "version": "1.0.0",
   "description": "A small Angular application for tracking a reading list using local storage",
+  "main": "electron/main.js",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
     "server": "node server.js",
     "dev": "concurrently \"npm run server\" \"npm start\"",
     "build": "ng build",
+    "build:prod": "ng build --configuration production",
+    "electron": "electron .",
+    "electron:run": "npm run build:prod && electron .",
+    "pack": "npm run build:prod && electron-builder",
+    "pack:win": "npm run build:prod && electron-builder --win",
+    "pack:mac": "npm run build:prod && electron-builder --mac",
+    "pack:linux": "npm run build:prod && electron-builder --linux",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },
@@ -41,6 +49,25 @@
     "karma-coverage": "~2.2.0",
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
-    "typescript": "~5.2.2"
+    "typescript": "~5.2.2",
+    "electron": "^28.0.0",
+    "electron-builder": "^24.9.1"
+  },
+  "build": {
+    "appId": "com.books.readinglist",
+    "productName": "Books Reading List",
+    "icon": "src/favicon.ico",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "electron/**/*",
+      "server.js",
+      "dist/**/*",
+      "package.json"
+    ],
+    "extraMetadata": {
+      "main": "electron/main.js"
+    }
   }
 }
